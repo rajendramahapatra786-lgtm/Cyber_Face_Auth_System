@@ -1,5 +1,7 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,13 +9,13 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Share Tech Mono', monospace;
             background: linear-gradient(135deg, #0a0a2a 0%, #0a0a0a 100%);
@@ -21,26 +23,31 @@
             overflow-x: hidden;
             color: #00ffff;
         }
-        
+
         .cyber-grid {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: 
+            background-image:
                 linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
             background-size: 50px 50px;
             animation: gridMove 20s linear infinite;
             z-index: 0;
         }
-        
+
         @keyframes gridMove {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(50px, 50px); }
+            0% {
+                transform: translate(0, 0);
+            }
+
+            100% {
+                transform: translate(50px, 50px);
+            }
         }
-        
+
         .cyber-container {
             position: relative;
             z-index: 1;
@@ -49,7 +56,7 @@
             padding: 2rem;
             text-align: center;
         }
-        
+
         .cyber-title {
             font-size: 2.5rem;
             font-weight: bold;
@@ -58,22 +65,39 @@
             text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 40px #00ffff;
             animation: pulse 2s ease-in-out infinite;
         }
-        
+
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.8;
+            }
         }
-        
+
         .glitch {
             animation: glitch 3s infinite;
         }
-        
+
         @keyframes glitch {
-            0%, 100% { transform: skew(0deg); }
-            96% { transform: skew(2deg); }
-            97% { transform: skew(-2deg); }
+
+            0%,
+            100% {
+                transform: skew(0deg);
+            }
+
+            96% {
+                transform: skew(2deg);
+            }
+
+            97% {
+                transform: skew(-2deg);
+            }
         }
-        
+
         .scan-line {
             position: absolute;
             bottom: 0;
@@ -83,19 +107,24 @@
             background: linear-gradient(90deg, transparent, #00ffff, transparent);
             animation: scanMove 2s linear infinite;
         }
-        
+
         @keyframes scanMove {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
         }
-        
+
         .cyber-subtitle {
             color: #ff00ff;
             font-size: 0.8rem;
             letter-spacing: 2px;
             margin: 1rem 0;
         }
-        
+
         .camera-container {
             position: relative;
             margin: 2rem auto;
@@ -104,7 +133,7 @@
             border-radius: 10px;
             overflow: hidden;
         }
-        
+
         .camera-frame {
             position: relative;
             width: 100%;
@@ -113,26 +142,52 @@
             border-radius: 10px;
             overflow: hidden;
         }
-        
+
         .camera-frame video {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-        
-        .corner-tl, .corner-tr, .corner-bl, .corner-br {
+
+        .corner-tl,
+        .corner-tr,
+        .corner-bl,
+        .corner-br {
             position: absolute;
             width: 25px;
             height: 25px;
             border: 2px solid #00ffff;
             z-index: 2;
         }
-        
-        .corner-tl { top: 10px; left: 10px; border-right: 0; border-bottom: 0; }
-        .corner-tr { top: 10px; right: 10px; border-left: 0; border-bottom: 0; }
-        .corner-bl { bottom: 10px; left: 10px; border-right: 0; border-top: 0; }
-        .corner-br { bottom: 10px; right: 10px; border-left: 0; border-top: 0; }
-        
+
+        .corner-tl {
+            top: 10px;
+            left: 10px;
+            border-right: 0;
+            border-bottom: 0;
+        }
+
+        .corner-tr {
+            top: 10px;
+            right: 10px;
+            border-left: 0;
+            border-bottom: 0;
+        }
+
+        .corner-bl {
+            bottom: 10px;
+            left: 10px;
+            border-right: 0;
+            border-top: 0;
+        }
+
+        .corner-br {
+            bottom: 10px;
+            right: 10px;
+            border-left: 0;
+            border-top: 0;
+        }
+
         .status-panel {
             background: rgba(0, 0, 0, 0.8);
             border: 1px solid #00ffff;
@@ -143,23 +198,30 @@
             justify-content: space-between;
             align-items: center;
         }
-        
+
         .status-text {
             font-size: 0.8rem;
             text-align: left;
         }
-        
+
         .prompt {
             color: #ff00ff;
             margin-right: 10px;
             animation: blink 1s infinite;
         }
-        
+
         @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
         }
-        
+
         .led {
             width: 10px;
             height: 10px;
@@ -167,19 +229,26 @@
             background: #00ff00;
             animation: ledPulse 1s infinite;
         }
-        
+
         @keyframes ledPulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
         }
-        
+
         .button-group {
             display: flex;
             gap: 1rem;
             justify-content: center;
             margin: 2rem 0;
         }
-        
+
         .cyber-btn {
             padding: 12px 30px;
             font-family: 'Share Tech Mono', monospace;
@@ -191,34 +260,34 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        
+
         .cyber-btn-primary {
             background: linear-gradient(135deg, #00ffff, #0088ff);
             color: #000;
             box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
         }
-        
+
         .cyber-btn-primary:hover:not(:disabled) {
             transform: scale(1.05);
             box-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
         }
-        
+
         .cyber-btn-secondary {
             background: transparent;
             color: #00ffff;
             border: 2px solid #00ffff;
         }
-        
+
         .cyber-btn-secondary:hover {
             background: rgba(0, 255, 255, 0.1);
             transform: scale(1.05);
         }
-        
+
         .cyber-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
-        
+
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -232,7 +301,7 @@
             align-items: center;
             flex-direction: column;
         }
-        
+
         .loading-bar {
             width: 300px;
             height: 4px;
@@ -241,19 +310,24 @@
             overflow: hidden;
             margin-top: 20px;
         }
-        
+
         .loading-progress {
             width: 0%;
             height: 100%;
             background: linear-gradient(90deg, #00ffff, #ff00ff);
             animation: loadingAnim 2s ease forwards;
         }
-        
+
         @keyframes loadingAnim {
-            0% { width: 0%; }
-            100% { width: 100%; }
+            0% {
+                width: 0%;
+            }
+
+            100% {
+                width: 100%;
+            }
         }
-        
+
         .security-notice {
             position: fixed;
             bottom: 20px;
@@ -266,67 +340,82 @@
             font-size: 0.7rem;
             white-space: nowrap;
         }
-        
+
         .notice-content {
             display: flex;
             gap: 10px;
             align-items: center;
             color: #ff00ff;
         }
-        
+
         @media (max-width: 768px) {
             .camera-container {
                 width: 90%;
                 height: auto;
                 aspect-ratio: 4/3;
             }
+
             .cyber-title {
                 font-size: 1.5rem;
             }
+
             .button-group {
                 flex-direction: column;
                 padding: 0 1rem;
             }
+
             .security-notice {
                 white-space: normal;
                 text-align: center;
                 font-size: 0.6rem;
             }
         }
-        
+
         @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; visibility: hidden; }
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+                visibility: hidden;
+            }
         }
-        
+
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="cyber-grid"></div>
-    
+
     <div class="cyber-container">
         <div style="position: relative; margin-bottom: 1rem;">
             <h1 class="cyber-title glitch">🔷 CYBER FACE AUTH</h1>
             <div class="scan-line"></div>
         </div>
-        
+
         <p class="cyber-subtitle">⚡ Neural Recognition System v2.0 ⚡</p>
-        
+
         <div class="camera-container">
             <div class="camera-frame">
                 <div class="corner-tl"></div>
                 <div class="corner-tr"></div>
-<div class="corner-bl"></div>
+                <div class="corner-bl"></div>
                 <div class="corner-br"></div>
                 <video id="video" autoplay playsinline></video>
                 <canvas id="canvas" style="display: none;"></canvas>
             </div>
         </div>
-        
+
         <div class="status-panel">
             <div class="status-text">
                 <span class="prompt">></span>
@@ -334,12 +423,12 @@
             </div>
             <div class="led" id="statusLed"></div>
         </div>
-        
+
         <div class="button-group">
             <button id="scanBtn" class="cyber-btn cyber-btn-primary">🔓 INITIATE SCAN</button>
             <button id="resetBtn" class="cyber-btn cyber-btn-secondary">⟳ RESET</button>
         </div>
-        
+
         <div class="security-notice">
             <div class="notice-content">
                 <span>⚠️</span>
@@ -348,111 +437,185 @@
             </div>
         </div>
     </div>
-    
+    <script src="{% static 'js/cyber-sound.js' %}"></script>
     <script>
-        // Camera and Face Recognition
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
-        const scanBtn = document.getElementById('scanBtn');
-        const resetBtn = document.getElementById('resetBtn');
-        const statusMessage = document.getElementById('statusMessage');
-        const statusLed = document.getElementById('statusLed');
-        
-        let stream = null;
-        let isProcessing = false;
-        
-        async function initCamera() {
-            try {
-                updateStatus('INITIALIZING CAMERA...', '#ffff00');
-                stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                video.srcObject = stream;
-                updateStatus('CAMERA READY. POSITION YOUR FACE', '#00ff00');
-                statusLed.style.background = '#00ff00';
-            } catch (err) {
-                updateStatus('ERROR: CAMERA ACCESS DENIED', '#ff0000');
-                statusLed.style.background = '#ff0000';
-                scanBtn.disabled = true;
-            }
+    // Camera and Face Recognition
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const scanBtn = document.getElementById('scanBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const statusMessage = document.getElementById('statusMessage');
+    const statusLed = document.getElementById('statusLed');
+
+    let stream = null;
+    let isProcessing = false;
+    let attemptCount = 0; // 🚨 TRACK ATTEMPTS
+
+    // 🔊 SOUND SYSTEM
+    let scanAudio = null;
+
+    const sounds = {
+        granted: new Audio('/static/sounds/access-granted.mp3'),
+        denied: new Audio('/static/sounds/access-denied.mp3'),
+        scan: new Audio('/static/sounds/scan.mp3'),
+        warning: new Audio('/static/sounds/warning.mp3')
+    };
+
+    function playSound(name) {
+        const sound = sounds[name];
+        if (!sound) return;
+
+        sound.currentTime = 0;
+        sound.loop = false;
+        sound.play().catch(e => console.log("Sound blocked:", e));
+    }
+
+    function startScanSound() {
+        stopScanSound(); // safety
+        scanAudio = sounds.scan;
+        scanAudio.loop = true;
+        scanAudio.currentTime = 0;
+        scanAudio.play().catch(e => console.log("Scan blocked:", e));
+    }
+
+    function stopScanSound() {
+        if (scanAudio) {
+            scanAudio.pause();
+            scanAudio.currentTime = 0;
         }
-        
-        function updateStatus(msg, color) {
-            statusMessage.textContent = msg;
-            statusMessage.style.color = color;
-        }
-        
-        function showAccessGranted(name) {
-            return new Promise((resolve) => {
-                const overlay = document.createElement('div');
-                overlay.className = 'loading-overlay';
-                overlay.innerHTML = `
-                    <div style="text-align: center; animation: fadeIn 0.5s;">
-                        <h1 style="color: #00ff00; font-size: 2rem;">🔓 ACCESS GRANTED</h1>
-                        <div style="color: #00ffff; margin: 1rem;">IDENTITY: ${name.toUpperCase()}</div>
-                        <div class="loading-bar"><div class="loading-progress"></div></div>
-                        <div style="color: #00ffff; margin-top: 1rem;">REDIRECTING...</div>
-                    </div>
-                `;
-                document.body.appendChild(overlay);
-                setTimeout(() => {
-                    overlay.remove();
-                    resolve();
-                }, 2500);
-            });
-        }
-        
-        async function captureAndVerify() {
-            if (isProcessing) return;
-            isProcessing = true;
+    }
+
+    // 🔓 Unlock browser audio
+    document.addEventListener("click", () => {
+        playSound('scan');
+    }, { once: true });
+
+    async function initCamera() {
+        try {
+            updateStatus('INITIALIZING CAMERA...', '#ffff00');
+            stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = stream;
+            updateStatus('CAMERA READY. POSITION YOUR FACE', '#00ff00');
+            statusLed.style.background = '#00ff00';
+        } catch (err) {
+            updateStatus('ERROR: CAMERA ACCESS DENIED', '#ff0000');
+            statusLed.style.background = '#ff0000';
             scanBtn.disabled = true;
-            updateStatus('SCANNING FACE...', '#ffff00');
-            statusLed.style.background = '#ffff00';
-            
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            canvas.getContext('2d').drawImage(video, 0, 0);
-            const imageData = canvas.toDataURL('image/jpeg', 0.8);
-            
-            try {
-                const response = await fetch('/api/face/verify/', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ image: imageData })
-                });
-                const result = await response.json();
-                
-                if (result.status === 'success') {
-                    updateStatus(`WELCOME ${result.name.toUpperCase()}`, '#00ff00');
-                    statusLed.style.background = '#00ff00';
-                    localStorage.setItem('cyber_user', result.name);
-                    await showAccessGranted(result.name);
-                    window.location.href = '/dashboard/';
-                } else {
-                    updateStatus('ACCESS DENIED - FACE NOT RECOGNIZED', '#ff0000');
-                    statusLed.style.background = '#ff0000';
-                    setTimeout(() => {
-                        updateStatus('READY FOR SCAN', '#00ffff');
-                        statusLed.style.background = '#00ffff';
-                    }, 2000);
-                }
-            } catch (err) {
-                updateStatus('ERROR: SERVER CONNECTION FAILED', '#ff0000');
-            } finally {
-                isProcessing = false;
-                scanBtn.disabled = false;
-            }
         }
-        
-        function resetSystem() {
-            updateStatus('SYSTEM RESETTING...', '#ffff00');
-            setTimeout(() => updateStatus('READY FOR SCAN', '#00ffff'), 1500);
-        }
-        
-        scanBtn.addEventListener('click', captureAndVerify);
-        resetBtn.addEventListener('click', resetSystem);
-        window.addEventListener('load', initCamera);
-        window.addEventListener('beforeunload', () => {
-            if (stream) stream.getTracks().forEach(t => t.stop());
+    }
+
+    function updateStatus(msg, color) {
+        statusMessage.textContent = msg;
+        statusMessage.style.color = color;
+    }
+
+    function showAccessGranted(name) {
+        return new Promise((resolve) => {
+            const overlay = document.createElement('div');
+            overlay.className = 'loading-overlay';
+            overlay.innerHTML = `
+                <div style="text-align: center; animation: fadeIn 0.5s;">
+                    <h1 style="color: #00ff00; font-size: 2rem;">🔓 ACCESS GRANTED</h1>
+                    <div style="color: #00ffff; margin: 1rem;">IDENTITY: ${name.toUpperCase()}</div>
+                    <div class="loading-bar"><div class="loading-progress"></div></div>
+                    <div style="color: #00ffff; margin-top: 1rem;">REDIRECTING...</div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+            setTimeout(() => {
+                overlay.remove();
+                resolve();
+            }, 2500);
         });
-    </script>
+    }
+
+    async function captureAndVerify() {
+        if (isProcessing) return;
+        isProcessing = true;
+        scanBtn.disabled = true;
+
+        updateStatus('SCANNING FACE...', '#ffff00');
+        statusLed.style.background = '#ffff00';
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        const imageData = canvas.toDataURL('image/jpeg', 0.8);
+
+        try {
+            const response = await fetch('/api/face/verify/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image: imageData })
+            });
+
+            const result = await response.json();
+
+            if (result.status === 'success') {
+
+                stopScanSound(); // ⛔ STOP LOOP
+                playSound('granted'); // 🔊 SUCCESS
+                attemptCount = 0; // reset attempts
+
+                updateStatus(`WELCOME ${result.name.toUpperCase()}`, '#00ff00');
+                statusLed.style.background = '#00ff00';
+                localStorage.setItem('cyber_user', result.name);
+
+                await showAccessGranted(result.name);
+                window.location.href = '/dashboard/';
+
+            } else {
+
+                stopScanSound(); // ⛔ STOP LOOP
+                playSound('denied'); // 🔊 FAIL
+
+                attemptCount++; // 🚨 increase attempts
+
+                // 🚨 WARNING AFTER 7 ATTEMPTS
+                if (attemptCount >= 7) {
+                    playSound('warning');
+                }
+
+                updateStatus('ACCESS DENIED - FACE NOT RECOGNIZED', '#ff0000');
+                statusLed.style.background = '#ff0000';
+
+                setTimeout(() => {
+                    updateStatus('READY FOR SCAN', '#00ffff');
+                    statusLed.style.background = '#00ffff';
+                }, 2000);
+            }
+
+        } catch (err) {
+            stopScanSound();
+            updateStatus('ERROR: SERVER CONNECTION FAILED', '#ff0000');
+        } finally {
+            isProcessing = false;
+            scanBtn.disabled = false;
+        }
+    }
+
+    function resetSystem() {
+        attemptCount = 0; // reset attempts
+        stopScanSound();
+
+        updateStatus('SYSTEM RESETTING...', '#ffff00');
+        setTimeout(() => updateStatus('READY FOR SCAN', '#00ffff'), 1500);
+    }
+
+    // 🔥 SCAN BUTTON
+    scanBtn.addEventListener('click', () => {
+        startScanSound(); // 🔁 LOOP SOUND
+        captureAndVerify();
+    });
+
+    resetBtn.addEventListener('click', resetSystem);
+
+    window.addEventListener('load', initCamera);
+
+    window.addEventListener('beforeunload', () => {
+        if (stream) stream.getTracks().forEach(t => t.stop());
+    });
+</script>
 </body>
+
 </html>
