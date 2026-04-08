@@ -1,0 +1,78 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Intro</title>
+
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: black;
+        }
+
+        /* 🎥 FULLSCREEN VIDEO */
+        #aiVideo {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* 🔥 IMPORTANT */
+            z-index: -1;
+        }
+
+        /* 🧠 Overlay text */
+        .overlay {
+            position: absolute;
+            top: 10%;
+            width: 100%;
+            text-align: center;
+            color: lime;
+            font-size: 24px;
+            font-family: monospace;
+            text-shadow: 0 0 10px lime;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 🎥 FULLSCREEN VIDEO -->
+    <video id="aiVideo" autoplay>
+        <source src="{% static 'videos/video.mp4' %}" type="video/mp4">
+    </video>
+
+    <!-- 🧠 TEXT -->
+    <div class="overlay" id="text">
+        Initializing System...
+    </div>
+
+    <script>
+        const video = document.getElementById("aiVideo");
+
+        // 🔊 Balance sound
+        video.volume = 0.4;
+
+        // 🧠 AI voice
+        let aiText = "Welcome. Face authentication successful. Redirecting to dashboard. let's start raja.";
+
+        function speakText(text) {
+            let msg = new SpeechSynthesisUtterance(text);
+            msg.rate = 1;
+            msg.pitch = 1;
+            speechSynthesis.speak(msg);
+        }
+
+        video.onplay = function() {
+            speakText(aiText);
+        };
+
+        // ⏭️ Redirect
+        video.onended = function() {
+            window.location.href = "{% url 'dashboard' %}";
+        };
+    </script>
+
+</body>
+</html>
