@@ -377,7 +377,6 @@ window.cyberSounds = {
 document.addEventListener('DOMContentLoaded', () => {
     // Add mute button after a short delay
     setTimeout(() => {
-        addMuteButton();
         loadMutePreference();
         
         // Create visualizer (optional)
