@@ -15,20 +15,30 @@ class CyberFaceRecognizer:
         self.load_known_faces()
 
     def load_known_faces(self):
+        self.known_faces = {}
+
         for img_path in self.known_faces_dir.glob('*.jpg'):
-            name = img_path.stem
+            # name_0.jpg → name
+            name = img_path.stem.split('_')[0]
+
             img = cv2.imread(str(img_path))
+            if img is None:
+                continue
 
-            if img is not None:
-                gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-                faces = self.face_cascade.detectMultiScale(gray, 1.3, 5)
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            faces = self.face_cascade.detectMultiScale(gray, 1.3, 5)
 
-                if len(faces) > 0:
-                    x, y, w, h = faces[0]
-                    face_roi = cv2.resize(gray[y:y+h, x:x+w], (100, 100))
-                    self.known_faces[name] = face_roi
+            if len(faces) > 0:
+                x, y, w, h = faces[0]
+                face_roi = cv2.resize(gray[y:y+h, x:x+w], (100, 100))
 
-                    print(f"Loaded face: {name}")
+                # store multiple faces
+                if name not in self.known_faces:
+                    self.known_faces[name] = []
+
+                self.known_faces[name].append(face_roi)
+
+                print(f"Loaded: {img_path.name}")
 
     def detect_and_recognize(self, image_bytes):
         nparr = np.frombuffer(image_bytes, np.uint8)
@@ -50,15 +60,15 @@ class CyberFaceRecognizer:
         best_match = None
         best_confidence = 0
 
-        for name, known_face in self.known_faces.items():
-            result = cv2.matchTemplate(face_roi, known_face, cv2.TM_CCOEFF_NORMED)
-            confidence = result[0][0]
+        for name, face_list in self.known_faces.items():
+            for known_face in face_list:
+                result = cv2.matchTemplate(face_roi, known_face, cv2.TM_CCOEFF_NORMED)
+                confidence = result[0][0]
 
-            # 🔍 DEBUG PRINT
-            print("Comparing with:", name, "Confidence:", confidence)
+                print("Comparing:", name, "Confidence:", confidence)
 
-            if confidence > best_confidence and confidence > 0.35:
-                best_confidence = confidence
-                best_match = name
+                if confidence > best_confidence and confidence > 0.4:
+                    best_confidence = confidence
+                    best_match = name
 
         return best_match, best_confidence

@@ -62,6 +62,40 @@ async function initCamera() {
         if (scanBtn) scanBtn.disabled = true;
     }
 }
+// Capture 5 images from webcam
+async function registerFace() {
+    let frames = [];
+
+    for (let i = 0; i < 5; i++) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0);
+
+        const imageData = canvas.toDataURL('image/jpeg', 0.8);
+        frames.push(imageData);
+
+        // small delay between captures
+        await new Promise(r => setTimeout(r, 300));
+    }
+
+    const username = prompt("Enter your name:");
+
+    const response = await fetch('/api/face/register/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            username: username,
+            images: frames
+        })
+    });
+
+    const result = await response.json();
+    alert(result.message);
+}
+
+
 
 // Start Cyber Effects (glitch and scan animations)
 function startCyberEffects() {
