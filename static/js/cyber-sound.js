@@ -25,6 +25,9 @@ function initAudioContext() {
         return null;
     }
 }
+function toggleMute() {
+    isMuted = !isMuted;
+}
 
 // Generate synthetic beep sounds using Web Audio API
 function generateBeep(type, duration = 0.3) {
@@ -128,7 +131,7 @@ function generateBeep(type, duration = 0.3) {
 
 // Play sound effect
 async function playSound(soundName) {
-    if (isMuted) return;
+    // if (isMuted) return;
     
     // Try to load actual sound files first
     if (!soundsLoaded) {
@@ -238,7 +241,7 @@ function speakCyberMessage(messageType) {
 let typingInterval = null;
 
 function startTypingSound() {
-    if (isMuted) return;
+    // if (isMuted) return;
     
     if (typingInterval) clearInterval(typingInterval);
     typingInterval = setInterval(() => {
@@ -250,56 +253,6 @@ function stopTypingSound() {
     if (typingInterval) {
         clearInterval(typingInterval);
         typingInterval = null;
-    }
-}
-
-// Create and add mute button to UI
-function addMuteButton() {
-    const buttonGroup = document.querySelector('.button-group');
-    if (!buttonGroup) return;
-    
-    const muteBtn = document.createElement('button');
-    muteBtn.id = 'muteBtn';
-    muteBtn.className = 'cyber-btn cyber-btn-secondary';
-    muteBtn.innerHTML = '<span class="btn-text">🔊 MUTE</span>';
-    muteBtn.style.marginLeft = '10px';
-    
-    muteBtn.addEventListener('click', toggleMute);
-    buttonGroup.appendChild(muteBtn);
-}
-
-// Toggle mute/unmute all sounds
-function toggleMute() {
-    isMuted = !isMuted;
-    const muteBtn = document.getElementById('muteBtn');
-    
-    if (muteBtn) {
-        if (isMuted) {
-            muteBtn.innerHTML = '<span class="btn-text">🔇 UNMUTE</span>';
-            // Cancel any ongoing speech
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-            }
-        } else {
-            muteBtn.innerHTML = '<span class="btn-text">🔊 MUTE</span>';
-            // Play a test sound to confirm unmute
-            playSound('boot');
-        }
-    }
-    
-    // Store preference
-    localStorage.setItem('cyber_muted', isMuted);
-}
-
-// Load mute preference
-function loadMutePreference() {
-    const saved = localStorage.getItem('cyber_muted');
-    if (saved === 'true') {
-        isMuted = true;
-        const muteBtn = document.getElementById('muteBtn');
-        if (muteBtn) {
-            muteBtn.innerHTML = '<span class="btn-text">🔇 UNMUTE</span>';
-        }
     }
 }
 
@@ -366,7 +319,7 @@ function createSoundVisualizer() {
 window.cyberSounds = {
     playSound,
     speak,
-    toggleMute,
+    // toggleMute,
     isMuted: () => isMuted,
     startTypingSound,
     stopTypingSound,
@@ -377,7 +330,7 @@ window.cyberSounds = {
 document.addEventListener('DOMContentLoaded', () => {
     // Add mute button after a short delay
     setTimeout(() => {
-        loadMutePreference();
+        // loadMutePreference();
         
         // Create visualizer (optional)
         const visualizer = createSoundVisualizer();

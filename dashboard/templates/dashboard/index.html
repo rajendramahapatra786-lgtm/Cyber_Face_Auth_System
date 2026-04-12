@@ -2,6 +2,7 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,13 +10,13 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Share Tech Mono', monospace;
             background: linear-gradient(135deg, #0a0a2a 0%, #0a0a0a 100%);
@@ -23,7 +24,7 @@
             color: #00ffff;
             overflow-x: hidden;
         }
-        
+
         /* Cyber Grid */
         .cyber-grid {
             position: fixed;
@@ -31,19 +32,24 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: 
+            background-image:
                 linear-gradient(rgba(0, 255, 255, 0.05) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(0, 255, 255, 0.05) 1px, transparent 1px);
             background-size: 40px 40px;
             animation: gridMove 20s linear infinite;
             z-index: 0;
         }
-        
+
         @keyframes gridMove {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(40px, 40px); }
+            0% {
+                transform: translate(0, 0);
+            }
+
+            100% {
+                transform: translate(40px, 40px);
+            }
         }
-        
+
         /* Main Container */
         .dashboard-container {
             position: relative;
@@ -52,7 +58,7 @@
             max-width: 1400px;
             margin: 0 auto;
         }
-        
+
         /* Header */
         .cyber-header {
             text-align: center;
@@ -60,27 +66,40 @@
             border-bottom: 2px solid #00ffff;
             padding-bottom: 1rem;
         }
-        
+
         .cyber-title {
             font-size: 2rem;
             letter-spacing: 5px;
             text-shadow: 0 0 10px #00ffff;
             animation: glitch 3s infinite;
         }
-        
+
         @keyframes glitch {
-            0%, 100% { transform: skew(0deg); }
-            95% { transform: skew(0deg); }
-            96% { transform: skew(2deg); }
-            97% { transform: skew(-2deg); }
+
+            0%,
+            100% {
+                transform: skew(0deg);
+            }
+
+            95% {
+                transform: skew(0deg);
+            }
+
+            96% {
+                transform: skew(2deg);
+            }
+
+            97% {
+                transform: skew(-2deg);
+            }
         }
-        
+
         .user-info {
             color: #ff00ff;
             font-size: 0.9rem;
             margin-top: 10px;
         }
-        
+
         /* Dashboard Grid */
         .dashboard-grid {
             display: grid;
@@ -88,7 +107,7 @@
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
-        
+
         /* Cyber Cards */
         .cyber-card {
             background: rgba(0, 0, 0, 0.8);
@@ -100,12 +119,12 @@
             position: relative;
             overflow: hidden;
         }
-        
+
         .cyber-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
         }
-        
+
         .card-title {
             color: #00ffff;
             font-size: 1.3rem;
@@ -113,12 +132,12 @@
             border-left: 3px solid #ff00ff;
             padding-left: 10px;
         }
-        
+
         /* Password Cracker Simulation */
         .password-area {
             margin: 1rem 0;
         }
-        
+
         .password-display {
             background: #000;
             padding: 10px;
@@ -127,7 +146,7 @@
             letter-spacing: 2px;
             margin-bottom: 10px;
         }
-        
+
         .progress-bar-container {
             background: #1a1a1a;
             height: 30px;
@@ -135,7 +154,7 @@
             overflow: hidden;
             margin: 10px 0;
         }
-        
+
         .progress-fill {
             background: linear-gradient(90deg, #00ffff, #ff00ff);
             height: 100%;
@@ -148,7 +167,7 @@
             font-weight: bold;
             font-size: 0.8rem;
         }
-        
+
         /* IP Tracker */
         .ip-display {
             background: #000;
@@ -157,13 +176,13 @@
             text-align: center;
             margin: 10px 0;
         }
-        
+
         .ip-address {
             font-size: 1.5rem;
             color: #ff00ff;
             font-weight: bold;
         }
-        
+
         /* Terminal */
         .terminal {
             background: #000;
@@ -175,22 +194,22 @@
             border: 1px solid #00ffff;
             margin: 10px 0;
         }
-        
+
         .terminal-line {
             color: #00ff00;
             margin-bottom: 5px;
         }
-        
+
         .terminal-input-area {
             display: flex;
             margin-top: 10px;
         }
-        
+
         .terminal-prompt {
             color: #ff00ff;
             margin-right: 10px;
         }
-        
+
         .terminal-input {
             background: transparent;
             border: none;
@@ -199,32 +218,32 @@
             flex: 1;
             outline: none;
         }
-        
+
         /* System Stats */
         .stat-item {
             margin: 15px 0;
         }
-        
+
         .stat-label {
             display: flex;
             justify-content: space-between;
             margin-bottom: 5px;
         }
-        
+
         .stat-bar {
             background: #1a1a1a;
             height: 20px;
             border-radius: 3px;
             overflow: hidden;
         }
-        
+
         .stat-fill {
             background: linear-gradient(90deg, #00ffff, #0088ff);
             height: 100%;
             width: 0%;
             transition: width 0.5s ease;
         }
-        
+
         /* Action Buttons */
         .action-buttons {
             display: flex;
@@ -232,7 +251,7 @@
             justify-content: center;
             margin-top: 2rem;
         }
-        
+
         .cyber-btn {
             padding: 10px 25px;
             font-family: 'Share Tech Mono', monospace;
@@ -244,23 +263,23 @@
             text-transform: uppercase;
             letter-spacing: 2px;
         }
-        
+
         .cyber-btn:hover {
             background: rgba(0, 255, 255, 0.2);
             box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
             transform: scale(1.05);
         }
-        
+
         .cyber-btn-danger {
             border-color: #ff0000;
             color: #ff0000;
         }
-        
+
         .cyber-btn-danger:hover {
             background: rgba(255, 0, 0, 0.2);
             box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
         }
-        
+
         /* Security Notice */
         .security-notice {
             text-align: center;
@@ -272,7 +291,7 @@
             color: #ff0000;
             font-size: 0.8rem;
         }
-        
+
         /* Scan Effect */
         .scan-effect-overlay {
             position: fixed;
@@ -280,35 +299,41 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, 
-                transparent 0%,
-                rgba(0, 255, 255, 0.1) 50%,
-                transparent 100%);
+            background: linear-gradient(90deg,
+                    transparent 0%,
+                    rgba(0, 255, 255, 0.1) 50%,
+                    transparent 100%);
             animation: scanOnce 1s ease-out;
             pointer-events: none;
             z-index: 1000;
         }
-        
+
         @keyframes scanOnce {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
         }
-        
+
         /* Responsive */
         @media (max-width: 768px) {
             .dashboard-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .cyber-title {
                 font-size: 1.5rem;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="cyber-grid"></div>
-    
+
     <div class="dashboard-container">
         <!-- Header -->
         <div class="cyber-header">
@@ -317,7 +342,7 @@
                 <span id="userName">LOADING...</span> | ACCESS LEVEL: ADMIN | SESSION: ACTIVE
             </div>
         </div>
-        
+
         <!-- Dashboard Grid -->
         <div class="dashboard-grid">
             <!-- Password Cracker Simulation -->
@@ -333,7 +358,7 @@
                     </button>
                 </div>
             </div>
-            
+
             <!-- IP Tracker Simulation -->
             <div class="cyber-card">
                 <div class="card-title">🌐 LIVE IP TRACKER</div>
@@ -347,7 +372,7 @@
                     SCAN NETWORK
                 </button>
             </div>
-            
+
             <!-- System Stats -->
             <div class="cyber-card">
                 <div class="card-title">📊 SYSTEM PERFORMANCE</div>
@@ -379,7 +404,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Terminal Interface -->
             <div class="cyber-card">
                 <div class="card-title">💻 COMMAND TERMINAL</div>
@@ -394,13 +419,13 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Action Buttons -->
         <div class="action-buttons">
             <button class="cyber-btn" id="refreshBtn">⟳ REFRESH DATA</button>
             <button class="cyber-btn cyber-btn-danger" id="logoutBtn">🚪 EXIT SYSTEM</button>
         </div>
-        
+
         <!-- Security Notice -->
         <div class="security-notice">
             ⚠️ EDUCATIONAL SIMULATION ONLY - No actual hacking or data breaches are performed ⚠️
@@ -408,45 +433,48 @@
     </div>
 
     <script src="{% static 'js/cyber-sound.js' %}"></script>
-    
+
     <script>
         // Get username from session storage or URL
         let userName = localStorage.getItem('cyber_user') || 'RAJENDRA';
         document.getElementById('userName').textContent = `USER: ${userName}`;
-        
+
         // Password Cracker Simulation
         let crackingInterval = null;
         const passwords = ['admin123', 'password', 'cyber2024', 'secret', 'root', 'system'];
         let currentPassword = passwords[Math.floor(Math.random() * passwords.length)];
         let currentIndex = 0;
         
-        document.getElementById('startCrackBtn').addEventListener('click', function() {
+        document.getElementById('startCrackBtn').addEventListener('click', function () {
+            new Audio('/static/sounds/boot.mp3').play();
+
+            // cyberSounds.playSound('scan'); // 🔊 ADD THIS LINE
             if (crackingInterval) {
                 clearInterval(crackingInterval);
                 crackingInterval = null;
                 this.textContent = 'INITIATE BRUTE FORCE';
                 return;
             }
-            
+
             this.textContent = 'CRACKING...';
             currentIndex = 0;
             const progressBar = document.getElementById('crackProgress');
             const passwordDisplay = document.getElementById('passwordDisplay');
-            
+
             crackingInterval = setInterval(() => {
                 if (currentIndex <= 100) {
                     progressBar.style.width = currentIndex + '%';
                     progressBar.textContent = currentIndex + '%';
-                    
+
                     // Simulate password guessing
                     if (currentIndex % 10 === 0) {
                         let guess = '';
-                        for(let i = 0; i < Math.floor(Math.random() * 10) + 4; i++) {
+                        for (let i = 0; i < Math.floor(Math.random() * 10) + 4; i++) {
                             guess += String.fromCharCode(97 + Math.floor(Math.random() * 26));
                         }
                         passwordDisplay.textContent = guess;
                     }
-                    
+
                     currentIndex++;
                 } else {
                     clearInterval(crackingInterval);
@@ -459,24 +487,26 @@
                 }
             }, 50);
         });
-        
+
         // IP Tracker Simulation
         function generateRandomIP() {
             return `${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
         }
-        
+
         function updateIP() {
             const ip = generateRandomIP();
             document.getElementById('targetIP').textContent = ip;
-            
+
             const locations = ['New York, USA', 'London, UK', 'Tokyo, Japan', 'Berlin, Germany', 'Sydney, Australia', 'Moscow, Russia'];
             document.getElementById('ipLocation').textContent = `Location: ${locations[Math.floor(Math.random() * locations.length)]}`;
-            
+
             const statuses = ['Monitoring', 'Tracking', 'Analyzing', 'Secure'];
             document.getElementById('ipStatus').textContent = `Status: ${statuses[Math.floor(Math.random() * statuses.length)]}`;
         }
-        
-        document.getElementById('scanIPBtn').addEventListener('click', function() {
+
+        document.getElementById('scanIPBtn').addEventListener('click', function () {
+           new Audio('/static/sounds/scan_2.mp3').play();
+            // cyberSounds.playSound('scan');
             this.textContent = 'SCANNING...';
             setTimeout(() => {
                 updateIP();
@@ -488,26 +518,26 @@
                 setTimeout(() => overlay.remove(), 1000);
             }, 1500);
         });
-        
+
         // System Stats Simulation
         function updateSystemStats() {
             const cpu = Math.floor(Math.random() * 100);
             const ram = Math.floor(Math.random() * 100);
             const network = Math.floor(Math.random() * 100);
-            
+
             document.getElementById('cpuPercent').textContent = cpu + '%';
             document.getElementById('ramPercent').textContent = ram + '%';
             document.getElementById('networkPercent').textContent = network + '%';
-            
+
             document.getElementById('cpuFill').style.width = cpu + '%';
             document.getElementById('ramFill').style.width = ram + '%';
             document.getElementById('networkFill').style.width = network + '%';
         }
-        
+
         // Terminal Commands
         const terminal = document.getElementById('terminal');
         const terminalInput = document.getElementById('terminalInput');
-        
+
         function addTerminalLine(text, type = 'normal') {
             const line = document.createElement('div');
             line.className = 'terminal-line';
@@ -516,13 +546,13 @@
             terminal.appendChild(line);
             terminal.scrollTop = terminal.scrollHeight;
         }
-        
-        terminalInput.addEventListener('keypress', function(e) {
-            if(e.key === 'Enter') {
+
+        terminalInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
                 const cmd = this.value.toLowerCase();
                 addTerminalLine(`$ ${this.value}`);
-                
-                switch(cmd) {
+
+                switch (cmd) {
                     case 'help':
                         addTerminalLine('Available commands: help, status, scan, clear, exit, hack');
                         break;
@@ -549,43 +579,67 @@
                     default:
                         addTerminalLine(`Command not recognized: ${cmd}. Type 'help' for commands`, 'error');
                 }
-                
+
                 this.value = '';
             }
         });
-        
+
         // Refresh all data
-        document.getElementById('refreshBtn').addEventListener('click', function() {
+        document.getElementById('refreshBtn').addEventListener('click', function () {
+
+            cyberSounds.playSound('scan');
             updateSystemStats();
             updateIP();
             addTerminalLine('System data refreshed', 'success');
-            
+
             // Glitch effect
             document.body.style.animation = 'glitch 0.1s';
             setTimeout(() => document.body.style.animation = '', 200);
         });
-        
+
         // Logout
-        document.getElementById('logoutBtn').addEventListener('click', function() {
+        document.getElementById('logoutBtn').addEventListener('click', function () {
+
+            cyberSounds.playSound('scan');
             addTerminalLine('Terminating session...');
             setTimeout(() => {
                 localStorage.removeItem('cyber_user');
                 window.location.href = '/';
             }, 1000);
         });
-        
+
+
+        // 🔊 SOUND SYSTEM SETUP
+
+        // 1️⃣ Unlock audio + play BOOT on first click
+        document.addEventListener("click", () => {
+            cyberSounds.playSound('boot');
+        }, { once: true });
+
+
+        // 3️⃣ Play TYPING sound in terminal
+        if (terminalInput) {
+            terminalInput.addEventListener('keypress', function (e) {
+                cyberSounds.playSound('typing');
+
+                if (e.key === 'Enter') {
+                    // your existing terminal logic already runs above
+                }
+            });
+        }
         // Initialize
         updateSystemStats();
         updateIP();
-        
+
         // Update stats every 3 seconds
         setInterval(updateSystemStats, 3000);
         setInterval(updateIP, 5000);
-        
+
         // Add typing effect on load
         setTimeout(() => {
             addTerminalLine(`Welcome back, ${userName}! System ready.`, 'success');
         }, 1000);
     </script>
 </body>
+
 </html>
