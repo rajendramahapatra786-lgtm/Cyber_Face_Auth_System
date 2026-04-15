@@ -439,6 +439,10 @@
         let userName = localStorage.getItem('cyber_user') || 'RAJENDRA';
         document.getElementById('userName').textContent = `USER: ${userName}`;
 
+        let scanSound = new Audio('/static/sounds/scan_2.mp3');
+        let bootSound = new Audio('/static/sounds/boot.mp3');
+
+
         // Password Cracker Simulation
         let crackingInterval = null;
         const passwords = ['admin123', 'password', 'cyber2024', 'secret', 'root', 'system'];
@@ -446,18 +450,16 @@
         let currentIndex = 0;
 
         document.getElementById('startCrackBtn').addEventListener('click', function () {
-            new Audio('/static/sounds/boot.mp3').play();
 
-            // cyberSounds.playSound('scan'); // 🔊 ADD THIS LINE
-            if (crackingInterval) {
-                clearInterval(crackingInterval);
-                crackingInterval = null;
-                this.textContent = 'INITIATE BRUTE FORCE';
-                return;
-            }
+            if (crackingInterval) return;
+
+            // 🔊 START SOUND
+            bootSound.currentTime = 0;
+            bootSound.play();
 
             this.textContent = 'CRACKING...';
             currentIndex = 0;
+
             const progressBar = document.getElementById('crackProgress');
             const passwordDisplay = document.getElementById('passwordDisplay');
 
@@ -466,7 +468,6 @@
                     progressBar.style.width = currentIndex + '%';
                     progressBar.textContent = currentIndex + '%';
 
-                    // Simulate password guessing
                     if (currentIndex % 10 === 0) {
                         let guess = '';
                         for (let i = 0; i < Math.floor(Math.random() * 10) + 4; i++) {
@@ -479,8 +480,14 @@
                 } else {
                     clearInterval(crackingInterval);
                     crackingInterval = null;
+
+                    // 🔊 STOP SOUND EXACTLY HERE
+                    bootSound.pause();
+                    bootSound.currentTime = 0;
+
                     passwordDisplay.textContent = currentPassword;
                     this.textContent = 'PASSWORD CRACKED! ✓';
+
                     setTimeout(() => {
                         this.textContent = 'INITIATE BRUTE FORCE';
                     }, 2000);
@@ -505,20 +512,30 @@
         }
 
         document.getElementById('scanIPBtn').addEventListener('click', function () {
-            new Audio('/static/sounds/scan_2.mp3').play();
-            // cyberSounds.playSound('scan');
+
             this.textContent = 'SCANNING...';
+
+            // 🔊 START SOUND
+            scanSound.currentTime = 0;
+            scanSound.play();
+
             setTimeout(() => {
+
                 updateIP();
+
+                // 🔊 STOP SOUND
+                scanSound.pause();
+                scanSound.currentTime = 0;
+
                 this.textContent = 'SCAN NETWORK';
-                // Add scan effect
+
                 const overlay = document.createElement('div');
                 overlay.className = 'scan-effect-overlay';
                 document.body.appendChild(overlay);
                 setTimeout(() => overlay.remove(), 1000);
+
             }, 1500);
         });
-
         // System Stats Simulation
         function updateSystemStats() {
             const cpu = Math.floor(Math.random() * 100);
@@ -612,19 +629,13 @@
 
         // 🔊 SOUND SYSTEM SETUP
 
-       document.addEventListener("click", () => {
-    const temp = new Audio('/static/sounds/typing.mp3');
-    temp.play().then(() => {
-        temp.pause();
-        temp.currentTime = 0;
-    }).catch(() => {});
-}, { once: true });
-
-        // 1️⃣ Unlock audio + play BOOT on first click
-        // document.addEventListener("click", () => {
-        //     new Audio('/static/sounds/boot.mp3').play();
-        // }, { once: true });
-
+        document.addEventListener("click", () => {
+            const temp = new Audio('/static/sounds/typing.mp3');
+            temp.play().then(() => {
+                temp.pause();
+                temp.currentTime = 0;
+            }).catch(() => { });
+        }, { once: true });
 
         // 3️⃣ Play TYPING sound in terminal
         if (terminalInput) {
