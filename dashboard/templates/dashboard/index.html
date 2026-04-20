@@ -455,7 +455,12 @@
 
             // 🔊 START SOUND
             bootSound.currentTime = 0;
-            bootSound.play();
+            cyberAction({
+                sound: "boot.mp3",
+                text: "Initiating brute force attack"
+            });
+
+           
 
             this.textContent = 'CRACKING...';
             currentIndex = 0;
@@ -482,11 +487,15 @@
                     crackingInterval = null;
 
                     // 🔊 STOP SOUND EXACTLY HERE
-                    bootSound.pause();
-                    bootSound.currentTime = 0;
+                    // bootSound.pause();
+                    // bootSound.currentTime = 0;
 
                     passwordDisplay.textContent = currentPassword;
                     this.textContent = 'PASSWORD CRACKED! ✓';
+
+                    cyberAction({
+    text: "Password successfully cracked"
+});
 
                     setTimeout(() => {
                         this.textContent = 'INITIATE BRUTE FORCE';
@@ -517,15 +526,22 @@
 
             // 🔊 START SOUND
             scanSound.currentTime = 0;
-            scanSound.play();
+            cyberAction({
+                sound: "scan_2.mp3",
+                text: "Scanning network"
+            });
 
             setTimeout(() => {
 
                 updateIP();
 
+                  cyberAction({
+        text: "Network scan complete"
+    });
+
                 // 🔊 STOP SOUND
-                scanSound.pause();
-                scanSound.currentTime = 0;
+                // scanSound.pause();
+                // scanSound.currentTime = 0;
 
                 this.textContent = 'SCAN NETWORK';
 
@@ -604,7 +620,10 @@
         // Refresh all data
         document.getElementById('refreshBtn').addEventListener('click', function () {
 
-            new Audio('/static/sounds/scan_2.mp3').play();
+            cyberAction({
+                sound: null,
+                text: "System data refreshed"
+            });
 
             updateSystemStats();
             updateIP();
@@ -618,7 +637,10 @@
         // Logout
         document.getElementById('logoutBtn').addEventListener('click', function () {
 
-            new Audio('/static/sounds/scan_2.mp3').play();
+            cyberAction({
+                sound: "scan_2.mp3",
+                text: "Session terminated. Goodbye"
+            });
             addTerminalLine('Terminating session...');
             setTimeout(() => {
                 localStorage.removeItem('cyber_user');
@@ -646,6 +668,41 @@
                 }
             });
         }
+
+
+        function speak(text) {
+            window.speechSynthesis.cancel();
+
+            const speech = new SpeechSynthesisUtterance(text);
+            speech.pitch = 0.7;
+            speech.rate = 0.85;
+
+            const voices = window.speechSynthesis.getVoices();
+            speech.voice = voices.find(v => v.name.includes("Google")) || voices[0];
+
+            window.speechSynthesis.speak(speech);
+        }
+
+        function cyberAction({ sound = null, text = "", delay = 300 }) {
+            // 🔊 Play sound (if exists)
+            if (sound) {
+                const audio = new Audio(`/static/sounds/${sound}`);
+                audio.currentTime = 0;
+                audio.play();
+            }
+
+            // 🗣️ Speak
+            if (text) {
+                setTimeout(() => {
+                    speak(text);
+                }, sound ? delay : 0);
+            }
+        }
+
+        document.addEventListener("click", () => {
+            window.speechSynthesis.resume();
+        }, { once: true });
+
         // Initialize
         updateSystemStats();
         updateIP();
