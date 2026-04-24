@@ -439,8 +439,8 @@
         let userName = localStorage.getItem('cyber_user') || 'RAJENDRA';
         document.getElementById('userName').textContent = `USER: ${userName}`;
 
-        let scanSound = new Audio('/static/sounds/scan_2.mp3');
-        let bootSound = new Audio('/static/sounds/boot.mp3');
+        // let scanSound = new Audio('/static/sounds/scan_2.mp3');
+        // let bootSound = new Audio('/static/sounds/boot.mp3');
 
 
         // Password Cracker Simulation
@@ -453,21 +453,22 @@
 
             if (crackingInterval) return;
 
-            // 🔊 START SOUND
-            bootSound.currentTime = 0;
-            cyberAction({
-                sound: "boot.mp3",
-                text: "Initiating brute force attack"
-            });
-
-           
-
             this.textContent = 'CRACKING...';
             currentIndex = 0;
 
             const progressBar = document.getElementById('crackProgress');
             const passwordDisplay = document.getElementById('passwordDisplay');
 
+            // 🎤 STEP 1: START SPEECH
+            // speak("Brute force start");
+
+            // 🔊 STEP 2: START SOUND
+            let audio = new Audio('/static/sounds/boot.mp3');
+            audio.loop = true;
+            audio.volume = 0.6;
+            audio.play();
+
+            // 🚀 STEP 3: START ANIMATION (same as before)
             crackingInterval = setInterval(() => {
                 if (currentIndex <= 100) {
                     progressBar.style.width = currentIndex + '%';
@@ -486,16 +487,15 @@
                     clearInterval(crackingInterval);
                     crackingInterval = null;
 
-                    // 🔊 STOP SOUND EXACTLY HERE
-                    // bootSound.pause();
-                    // bootSound.currentTime = 0;
+                    // 🔇 STEP 4: STOP SOUND
+                    audio.pause();
+                    audio.currentTime = 0;
 
                     passwordDisplay.textContent = currentPassword;
                     this.textContent = 'PASSWORD CRACKED! ✓';
 
-                    cyberAction({
-    text: "Password successfully cracked"
-});
+                    // 🎤 STEP 5: END SPEECH
+                    speak("Password cracked successfully");
 
                     setTimeout(() => {
                         this.textContent = 'INITIATE BRUTE FORCE';
@@ -524,24 +524,23 @@
 
             this.textContent = 'SCANNING...';
 
-            // 🔊 START SOUND
-            scanSound.currentTime = 0;
-            cyberAction({
-                sound: "scan_2.mp3",
-                text: "Scanning network"
-            });
+            // 🔊 START SOUND (no speech at start)
+            let audio = new Audio('/static/sounds/scan_2.mp3');
+            audio.currentTime = 0;
+            audio.play();
 
             setTimeout(() => {
 
                 updateIP();
 
-                  cyberAction({
-        text: "Network scan complete"
-    });
+                // 🔇 STOP SOUND
+                audio.pause();
+                audio.currentTime = 0;
 
-                // 🔊 STOP SOUND
-                // scanSound.pause();
-                // scanSound.currentTime = 0;
+                // 🎤 ONLY END SPEECH
+                setTimeout(() => {
+                    speak("Network scan complete");
+                }, 300);
 
                 this.textContent = 'SCAN NETWORK';
 
@@ -670,19 +669,25 @@
         }
 
 
-        function speak(text) {
-            window.speechSynthesis.cancel();
+    function speak(text) {
+    window.speechSynthesis.cancel();
 
-            const speech = new SpeechSynthesisUtterance(text);
-            speech.pitch = 0.7;
-            speech.rate = 0.85;
+    const speech = new SpeechSynthesisUtterance(text);
 
-            const voices = window.speechSynthesis.getVoices();
-            speech.voice = voices.find(v => v.name.includes("Google")) || voices[0];
+    speech.pitch = 0.5;
+    speech.rate = 0.78;
+    speech.volume = 1;
 
-            window.speechSynthesis.speak(speech);
-        }
+    const voices = window.speechSynthesis.getVoices();
+    speech.voice =
+        voices.find(v => v.name.includes("Google UK English Male")) ||
+        voices[0];
 
+    // 🎧 slight delay for cinematic feel
+    setTimeout(() => {
+        window.speechSynthesis.speak(speech);
+    }, 100);
+}
         function cyberAction({ sound = null, text = "", delay = 300 }) {
             // 🔊 Play sound (if exists)
             if (sound) {

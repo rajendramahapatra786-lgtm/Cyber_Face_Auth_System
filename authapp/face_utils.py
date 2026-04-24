@@ -67,7 +67,7 @@ class CyberFaceRecognizer:
 
                 print("Comparing:", name, "Confidence:", confidence)
 
-                if confidence > best_confidence and confidence > 0.6:
+                if confidence > best_confidence and confidence > 0.5:
                     best_confidence = confidence
                     best_match = name
 
