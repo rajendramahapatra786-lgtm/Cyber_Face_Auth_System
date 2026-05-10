@@ -75,7 +75,7 @@ class CyberFaceRecognizer:
                     best_match = self.known_names[i]
 
             # Threshold (important)
-            if best_distance < 10:   # tune this later
+            if best_distance < 15:   # tune this later
                 confidence = 1 / (1 + best_distance)
                 return best_match, confidence
 

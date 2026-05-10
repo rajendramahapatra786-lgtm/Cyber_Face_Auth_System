@@ -449,7 +449,8 @@
 
     let stream = null;
     let isProcessing = false;
-    let attemptCount = 0; // 🚨 TRACK ATTEMPTS
+    let attemptCount = 0;
+    let instructionTimeout = null;
 
     // 🔊 SOUND SYSTEM
     let scanAudio = null;
@@ -464,14 +465,13 @@
     function playSound(name) {
         const sound = sounds[name];
         if (!sound) return;
-
         sound.currentTime = 0;
         sound.loop = false;
         sound.play().catch(e => console.log("Sound blocked:", e));
     }
 
     function startScanSound() {
-        stopScanSound(); // safety
+        stopScanSound();
         scanAudio = sounds.scan;
         scanAudio.loop = true;
         scanAudio.currentTime = 0;
@@ -485,7 +485,6 @@
         }
     }
 
-    // 🔓 Unlock browser audio
     document.addEventListener("click", () => {
         playSound('scan');
     }, { once: true });
@@ -509,6 +508,36 @@
         statusMessage.style.color = color;
     }
 
+    function showTemporaryInstruction(message, duration) {
+        const originalMessage = statusMessage.textContent;
+        const originalColor = statusMessage.style.color;
+        updateStatus(message, '#ff00ff');
+        if (instructionTimeout) clearTimeout(instructionTimeout);
+        instructionTimeout = setTimeout(() => {
+            updateStatus(originalMessage, originalColor);
+        }, duration);
+    }
+
+    // Capture multiple frames for liveness detection
+    async function captureMultipleFrames(frameCount = 20, intervalMs = 200) {
+        const frames = [];
+        
+        for (let i = 0; i < frameCount; i++) {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            const frameData = canvas.toDataURL('image/jpeg', 0.8);
+            frames.push(frameData);
+            
+            let seconds = ((i + 1) * intervalMs / 1000).toFixed(1);
+            updateStatus(`🔍 CAPTURING... ${seconds}s / 4s`, '#ffff00');
+            
+            await new Promise(resolve => setTimeout(resolve, intervalMs));
+        }
+        
+        return frames;
+    }
+
     function showAccessGranted(name) {
         return new Promise((resolve) => {
             const overlay = document.createElement('div');
@@ -529,35 +558,39 @@
         });
     }
 
-    async function captureAndVerify() {
+    // Main verification function with liveness
+    async function captureAndVerifyWithLiveness() {
         if (isProcessing) return;
         isProcessing = true;
         scanBtn.disabled = true;
 
-        updateStatus('SCANNING FACE...', '#ffff00');
+        showTemporaryInstruction('👁️ BLINK 2 TIMES NATURALLY (4 seconds)', 4000);
+        
+        startScanSound();
+        updateStatus('🎥 GETTING READY...', '#ffff00');
         statusLed.style.background = '#ffff00';
 
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        canvas.getContext('2d').drawImage(video, 0, 0);
-        const imageData = canvas.toDataURL('image/jpeg', 0.8);
-
         try {
-            const response = await fetch('/api/face/verify/', {
+            // Capture multiple frames for liveness detection
+            const frames = await captureMultipleFrames(20, 200);
+            
+            updateStatus('🔍 ANALYZING BLINKS & FACE...', '#ffff00');
+            
+            // Send frames for liveness + face verification
+            const response = await fetch('/api/face/verify-liveness/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ image: imageData })
+                body: JSON.stringify({ frames: frames })
             });
 
             const result = await response.json();
 
             if (result.status === 'success') {
+                stopScanSound();
+                playSound('granted');
+                attemptCount = 0;
 
-                stopScanSound(); // ⛔ STOP LOOP
-                playSound('granted'); // 🔊 SUCCESS
-                attemptCount = 0; // reset attempts
-
-                updateStatus(`WELCOME ${result.name.toUpperCase()}`, '#00ff00');
+                updateStatus(`✅ ${result.blink_count} BLINKS - WELCOME ${result.name.toUpperCase()}`, '#00ff00');
                 statusLed.style.background = '#00ff00';
                 localStorage.setItem('cyber_user', result.name);
 
@@ -565,29 +598,36 @@
                 window.location.href = '/dashboard/ai-intro/';
 
             } else {
+                stopScanSound();
+                playSound('denied');
+                attemptCount++;
 
-                stopScanSound(); // ⛔ STOP LOOP
-                playSound('denied'); // 🔊 FAIL
-
-                attemptCount++; // 🚨 increase attempts
-
-                // 🚨 WARNING AFTER 7 ATTEMPTS
-                if (attemptCount >= 7) {
-                    playSound('warning');
+                if (result.liveness_failed) {
+                    updateStatus(`❌ FAILED: Only ${result.blink_count} blink(s) detected (Need 2)`, '#ff0000');
+                    setTimeout(() => {
+                        showTemporaryInstruction('👁️ TIP: Blink 2 times naturally in 4 seconds', 3000);
+                    }, 2000);
+                } else {
+                    updateStatus(`❌ ${result.message}`, '#ff0000');
                 }
-
-                updateStatus('ACCESS DENIED - FACE NOT RECOGNIZED', '#ff0000');
+                
                 statusLed.style.background = '#ff0000';
+
+                if (attemptCount >= 3) {
+                    playSound('warning');
+                    updateStatus('⚠️ MULTIPLE FAILED ATTEMPTS', '#ff00ff');
+                }
 
                 setTimeout(() => {
                     updateStatus('READY FOR SCAN', '#00ffff');
                     statusLed.style.background = '#00ffff';
-                }, 2000);
+                }, 2500);
             }
 
         } catch (err) {
             stopScanSound();
-            updateStatus('ERROR: SERVER CONNECTION FAILED', '#ff0000');
+            updateStatus('ERROR: ' + err.message, '#ff0000');
+            console.error(err);
         } finally {
             isProcessing = false;
             scanBtn.disabled = false;
@@ -595,17 +635,16 @@
     }
 
     function resetSystem() {
-        attemptCount = 0; // reset attempts
+        attemptCount = 0;
         stopScanSound();
-
+        if (instructionTimeout) clearTimeout(instructionTimeout);
         updateStatus('SYSTEM RESETTING...', '#ffff00');
         setTimeout(() => updateStatus('READY FOR SCAN', '#00ffff'), 1500);
     }
 
-    // 🔥 SCAN BUTTON
+    // Attach event listeners
     scanBtn.addEventListener('click', () => {
-        startScanSound(); // 🔁 LOOP SOUND
-        captureAndVerify();
+        captureAndVerifyWithLiveness();
     });
 
     resetBtn.addEventListener('click', resetSystem);
@@ -614,6 +653,7 @@
 
     window.addEventListener('beforeunload', () => {
         if (stream) stream.getTracks().forEach(t => t.stop());
+        if (instructionTimeout) clearTimeout(instructionTimeout);
     });
 </script>
 </body>

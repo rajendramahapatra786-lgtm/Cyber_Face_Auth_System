@@ -3,3 +3,5 @@ opencv-python==4.8.1.78
 numpy==1.24.3
 Pillow==10.0.0
 django-cors-headers==4.2.0
+mediapipe==0.10.9
+deepface==0.0.79
