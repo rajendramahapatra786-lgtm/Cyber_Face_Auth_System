@@ -35,7 +35,7 @@ class FaceValidator:
             # FACE SIZE CHECK
             # -----------------------------------
 
-            if fw < 120:
+            if fw < 100:
                 return False, "❌ Move closer to camera"
 
             # -----------------------------------
