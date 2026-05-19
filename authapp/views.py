@@ -11,10 +11,16 @@ from .face_utils import CyberFaceRecognizer
 from .liveness import LivenessDetector
 from .face_validation import FaceValidator
 
+import os
+from django.conf import settings
+
 
 face_recognizer = CyberFaceRecognizer()
 liveness_detector = LivenessDetector()
 face_validator = FaceValidator()
+
+# Failed login counter
+failed_attempts = 0
 
 
 @csrf_exempt
@@ -64,6 +70,8 @@ def verify_with_liveness_first(request):
     Step 2 → Full face validation
     Step 3 → Face recognition
     """
+
+    global failed_attempts
 
     try:
         print("=" * 50)
@@ -133,7 +141,15 @@ def verify_with_liveness_first(request):
 
         name, confidence = face_recognizer.detect_and_recognize(image_bytes)
 
+        # =========================
+        # FACE MATCH SUCCESS
+        # =========================
+
         if name:
+
+            # Reset failed attempts
+            failed_attempts = 0
+
             return JsonResponse({
                 'status': 'success',
                 'name': name.title(),
@@ -142,12 +158,46 @@ def verify_with_liveness_first(request):
                 'message': f'✅ {blink_count} blinks detected - Face matched!'
             })
 
+        # =========================
+        # FACE MATCH FAILED
+        # =========================
+
         else:
-            return JsonResponse({
-                'status': 'fail',
-                'message': 'Face not recognized in database',
-                'blink_count': blink_count
-            })
+
+            failed_attempts += 1
+
+            print(f"Failed Attempts: {failed_attempts}")
+
+            # 1st Failed Attempt
+            if failed_attempts == 1:
+
+                return JsonResponse({
+                    'status': 'fail',
+                    'message': '⚠ Face not recognized. Please try again.',
+                    'blink_count': blink_count
+                })
+
+            # 2nd Failed Attempt
+            elif failed_attempts == 2:
+
+                save_intruder_image(frame)
+
+                return JsonResponse({
+                    'status': 'fail',
+                    'message': '📸 Unauthorized face detected. Intruder image captured.',
+                    'blink_count': blink_count
+                })
+
+            # 3rd Failed Attempt
+            elif failed_attempts >= 3:
+
+                save_intruder_image(frame)
+
+                return JsonResponse({
+                    'status': 'fail',
+                    'message': '🚫 System temporarily locked due to multiple failed attempts.',
+                    'blink_count': blink_count
+                })
 
     except json.JSONDecodeError as e:
 
@@ -207,3 +257,28 @@ def register_face(request):
             'status': 'error',
             'message': str(e)
         })
+
+
+# ===================================================
+# SAVE INTRUDER IMAGE
+# ===================================================
+
+def save_intruder_image(frame):
+
+    intruder_folder = os.path.join(
+        settings.MEDIA_ROOT,
+        'intruders'
+    )
+
+    os.makedirs(intruder_folder, exist_ok=True)
+
+    image_count = len(os.listdir(intruder_folder)) + 1
+
+    image_path = os.path.join(
+        intruder_folder,
+        f"intruder_{image_count}.jpg"
+    )
+
+    cv2.imwrite(image_path, frame)
+
+    print(f"Intruder image saved: {image_path}")
