@@ -1,25 +1,4 @@
 1. 🛡️ Security Features
-
-
-1.2 Intruder Detection System
-- Detect unauthorized face attempts
-- Save intruder images
-- Store failed login logs
-- Security alert popup
-- Attempt counter system
-
-
-1.3 Login Activity Monitoring
-
-Store:
-- Login time
-- Logout time
-- IP address
-- Device info
-- Success/failure logs
-- Face thumbnail
-
-
 ====================================================
 
 2. 💻 Cyberpunk UI Improvements

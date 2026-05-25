@@ -15,12 +15,32 @@ import os
 from django.conf import settings
 
 
+from .models import LoginActivity
+from django.core.files.base import ContentFile
+
+
+
 face_recognizer = CyberFaceRecognizer()
 liveness_detector = LivenessDetector()
 face_validator = FaceValidator()
 
+
+
+
 # Failed login counter
 failed_attempts = 0
+
+
+def get_client_ip(request):
+
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+
+    return ip
 
 
 @csrf_exempt
@@ -73,6 +93,8 @@ def verify_with_liveness_first(request):
 
     global failed_attempts
 
+    device_info = request.META.get('HTTP_USER_AGENT')
+
     try:
         print("=" * 50)
         print("Received request to verify-with-liveness")
@@ -98,7 +120,17 @@ def verify_with_liveness_first(request):
 
         print(f"Blink count: {blink_count}, Is live: {is_live}")
 
+        
+
+
         if not is_live:
+
+            LoginActivity.objects.create(
+                ip_address=get_client_ip(request),
+                device_info=device_info,
+                status='LIVENESS_FAILED'
+            )
+
             return JsonResponse({
                 'status': 'fail',
                 'message': f'BLINK FAILED: Only {blink_count} blink(s) detected. Need 2 blinks.',
@@ -150,6 +182,13 @@ def verify_with_liveness_first(request):
             # Reset failed attempts
             failed_attempts = 0
 
+            LoginActivity.objects.create(
+    user=None,
+    ip_address=get_client_ip(request),
+    device_info=device_info,
+    status='SUCCESS'
+)
+
             return JsonResponse({
                 'status': 'success',
                 'name': name.title(),
@@ -166,6 +205,12 @@ def verify_with_liveness_first(request):
 
             failed_attempts += 1
 
+            LoginActivity.objects.create(
+    ip_address=get_client_ip(request),
+    device_info=device_info,
+    status='FAILED'
+)
+
             print(f"Failed Attempts: {failed_attempts}")
 
             # 1st Failed Attempt
@@ -180,8 +225,7 @@ def verify_with_liveness_first(request):
             # 2nd Failed Attempt
             elif failed_attempts == 2:
 
-                save_intruder_image(frame)
-
+                save_intruder_image(frame, request)
                 return JsonResponse({
                     'status': 'fail',
                     'message': '📸 Unauthorized face detected. Intruder image captured.',
@@ -191,7 +235,7 @@ def verify_with_liveness_first(request):
             # 3rd Failed Attempt
             elif failed_attempts >= 3:
 
-                save_intruder_image(frame)
+                save_intruder_image(frame, request)
 
                 return JsonResponse({
                     'status': 'fail',
@@ -263,7 +307,7 @@ def register_face(request):
 # SAVE INTRUDER IMAGE
 # ===================================================
 
-def save_intruder_image(frame):
+def save_intruder_image(frame, request):
 
     intruder_folder = os.path.join(
         settings.MEDIA_ROOT,
@@ -274,11 +318,31 @@ def save_intruder_image(frame):
 
     image_count = len(os.listdir(intruder_folder)) + 1
 
+    filename = f"intruder_{image_count}.jpg"
+
     image_path = os.path.join(
         intruder_folder,
-        f"intruder_{image_count}.jpg"
+        filename
     )
 
     cv2.imwrite(image_path, frame)
 
     print(f"Intruder image saved: {image_path}")
+
+    # =========================
+    # SAVE TO LOGIN ACTIVITY
+    # =========================
+
+    activity = LoginActivity.objects.create(
+        ip_address=get_client_ip(request),
+        device_info=request.META.get('HTTP_USER_AGENT'),
+        status='UNKNOWN_FACE'
+    )
+
+    with open(image_path, 'rb') as f:
+
+        activity.face_image.save(
+            filename,
+            ContentFile(f.read()),
+            save=True
+        )
