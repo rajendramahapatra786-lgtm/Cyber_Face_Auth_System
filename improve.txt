@@ -3,20 +3,6 @@
 
 2. 💻 Cyberpunk UI Improvements
 
-2.1 Webcam Scan Interface
-
-Add:
-- Scanning lines
-- AI detection box
-- HUD overlay
-- Face lock animation
-- Neon cyber borders
-- Terminal-style messages
-
-Examples:
-- SCANNING FACE...
-- MATCH FOUND
-- AUTHORIZATION SUCCESSFUL
 
 
 2.2 Hacker Dashboard

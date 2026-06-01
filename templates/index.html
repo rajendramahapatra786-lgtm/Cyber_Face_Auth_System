@@ -391,6 +391,91 @@
                 opacity: 1;
             }
         }
+
+        /* Scanner Line */
+        .scanner-line {
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #00ffff, transparent);
+            box-shadow: 0 0 20px #00ffff;
+            animation: scannerMove 2s linear infinite;
+            z-index: 5;
+        }
+
+        @keyframes scannerMove {
+            0% {
+                top: 0%;
+            }
+
+            100% {
+                top: 100%;
+            }
+        }
+
+        /* AI Face Box */
+        .face-box {
+            position: absolute;
+            width: 180px;
+            height: 220px;
+            border: 3px solid #00ffff;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow:
+                0 0 10px #00ffff,
+                0 0 25px #00ffff;
+            animation: facePulse 1.5s infinite;
+            z-index: 4;
+        }
+
+        @keyframes facePulse {
+
+            0%,
+            100% {
+                box-shadow:
+                    0 0 10px #00ffff,
+                    0 0 25px #00ffff;
+            }
+
+            50% {
+                box-shadow:
+                    0 0 20px #00ffff,
+                    0 0 50px #00ffff;
+            }
+        }
+
+        /* HUD Overlay */
+        .hud-overlay {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #00ffff;
+            font-size: 12px;
+            z-index: 5;
+            text-shadow: 0 0 10px #00ffff;
+        }
+
+        /* Neon Border */
+        .camera-frame {
+            border: 2px solid #00ffff;
+            box-shadow:
+                0 0 10px #00ffff,
+                0 0 30px rgba(0, 255, 255, 0.5);
+        }
+
+        .terminal-box {
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #00ffff;
+            color: #00ff88;
+            text-align: left;
+            padding: 15px;
+            height: 140px;
+            overflow-y: auto;
+            font-size: 13px;
+            margin-top: 20px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+        }
     </style>
 </head>
 
@@ -407,11 +492,22 @@
 
         <div class="camera-container">
             <div class="camera-frame">
+
                 <div class="corner-tl"></div>
                 <div class="corner-tr"></div>
                 <div class="corner-bl"></div>
                 <div class="corner-br"></div>
+
+                <div class="face-box"></div>
+
+                <div class="hud-overlay">
+                    AI TRACKING ACTIVE
+                </div>
+
                 <video id="video" autoplay playsinline></video>
+
+                <div class="scanner-line"></div>
+
                 <canvas id="canvas" style="display: none;"></canvas>
             </div>
         </div>
@@ -424,9 +520,18 @@
             <div class="led" id="statusLed"></div>
         </div>
 
+        <div class="terminal-box" id="terminalBox">
+            > SYSTEM READY<br>
+        </div>
+
         <div class="button-group">
-            <button id="scanBtn" class="cyber-btn cyber-btn-primary">🔓 INITIATE SCAN</button>
-            <button id="resetBtn" class="cyber-btn cyber-btn-secondary">⟳ RESET</button>
+            <button id="scanBtn" class="cyber-btn cyber-btn-primary">
+                🔓 INITIATE SCAN
+            </button>
+
+            <button id="resetBtn" class="cyber-btn cyber-btn-secondary">
+                ⟳ RESET
+            </button>
         </div>
 
         <div class="security-notice">
@@ -439,110 +544,118 @@
     </div>
     <script src="{% static 'js/cyber-sound.js' %}"></script>
     <script>
-    // Camera and Face Recognition
-    const video = document.getElementById('video');
-    const canvas = document.getElementById('canvas');
-    const scanBtn = document.getElementById('scanBtn');
-    const resetBtn = document.getElementById('resetBtn');
-    const statusMessage = document.getElementById('statusMessage');
-    const statusLed = document.getElementById('statusLed');
+        // Camera and Face Recognition
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const scanBtn = document.getElementById('scanBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const statusMessage = document.getElementById('statusMessage');
+        const statusLed = document.getElementById('statusLed');
 
-    let stream = null;
-    let isProcessing = false;
-    let attemptCount = 0;
-    let instructionTimeout = null;
+        let stream = null;
+        let isProcessing = false;
+        let attemptCount = 0;
+        let instructionTimeout = null;
 
-    // 🔊 SOUND SYSTEM
-    let scanAudio = null;
+        // 🔊 SOUND SYSTEM
+        let scanAudio = null;
 
-    const sounds = {
-        granted: new Audio('/static/sounds/access-granted.mp3'),
-        denied: new Audio('/static/sounds/access-denied.mp3'),
-        scan: new Audio('/static/sounds/scan.mp3'),
-        warning: new Audio('/static/sounds/warning.mp3')
-    };
+        const sounds = {
+            granted: new Audio('/static/sounds/access-granted.mp3'),
+            denied: new Audio('/static/sounds/access-denied.mp3'),
+            scan: new Audio('/static/sounds/scan.mp3'),
+            warning: new Audio('/static/sounds/warning.mp3')
+        };
 
-    function playSound(name) {
-        const sound = sounds[name];
-        if (!sound) return;
-        sound.currentTime = 0;
-        sound.loop = false;
-        sound.play().catch(e => console.log("Sound blocked:", e));
-    }
+        function playSound(name) {
+            const sound = sounds[name];
+            if (!sound) return;
+            sound.currentTime = 0;
+            sound.loop = false;
+            sound.play().catch(e => console.log("Sound blocked:", e));
+        }
 
-    function startScanSound() {
-        stopScanSound();
-        scanAudio = sounds.scan;
-        scanAudio.loop = true;
-        scanAudio.currentTime = 0;
-        scanAudio.play().catch(e => console.log("Scan blocked:", e));
-    }
-
-    function stopScanSound() {
-        if (scanAudio) {
-            scanAudio.pause();
+        function startScanSound() {
+            stopScanSound();
+            scanAudio = sounds.scan;
+            scanAudio.loop = true;
             scanAudio.currentTime = 0;
+            scanAudio.play().catch(e => console.log("Scan blocked:", e));
         }
-    }
 
-    document.addEventListener("click", () => {
-        playSound('scan');
-    }, { once: true });
-
-    async function initCamera() {
-        try {
-            updateStatus('INITIALIZING CAMERA...', '#ffff00');
-            stream = await navigator.mediaDevices.getUserMedia({ video: true });
-            video.srcObject = stream;
-            updateStatus('CAMERA READY. POSITION YOUR FACE', '#00ff00');
-            statusLed.style.background = '#00ff00';
-        } catch (err) {
-            updateStatus('ERROR: CAMERA ACCESS DENIED', '#ff0000');
-            statusLed.style.background = '#ff0000';
-            scanBtn.disabled = true;
+        function stopScanSound() {
+            if (scanAudio) {
+                scanAudio.pause();
+                scanAudio.currentTime = 0;
+            }
         }
-    }
 
-    function updateStatus(msg, color) {
-        statusMessage.textContent = msg;
-        statusMessage.style.color = color;
-    }
+        document.addEventListener("click", () => {
+            playSound('scan');
+        }, { once: true });
 
-    function showTemporaryInstruction(message, duration) {
-        const originalMessage = statusMessage.textContent;
-        const originalColor = statusMessage.style.color;
-        updateStatus(message, '#ff00ff');
-        if (instructionTimeout) clearTimeout(instructionTimeout);
-        instructionTimeout = setTimeout(() => {
-            updateStatus(originalMessage, originalColor);
-        }, duration);
-    }
-
-    // Capture multiple frames for liveness detection
-    async function captureMultipleFrames(frameCount = 20, intervalMs = 200) {
-        const frames = [];
-        
-        for (let i = 0; i < frameCount; i++) {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            canvas.getContext('2d').drawImage(video, 0, 0);
-            const frameData = canvas.toDataURL('image/jpeg', 0.8);
-            frames.push(frameData);
-            
-            let seconds = ((i + 1) * intervalMs / 1000).toFixed(1);
-            updateStatus(`🔍 CAPTURING... ${seconds}s / 4s`, '#ffff00');
-            
-            await new Promise(resolve => setTimeout(resolve, intervalMs));
+        async function initCamera() {
+            try {
+                updateStatus('INITIALIZING CAMERA...', '#ffff00');
+                stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+                updateStatus('CAMERA READY. POSITION YOUR FACE', '#00ff00');
+                statusLed.style.background = '#00ff00';
+            } catch (err) {
+                updateStatus('ERROR: CAMERA ACCESS DENIED', '#ff0000');
+                statusLed.style.background = '#ff0000';
+                scanBtn.disabled = true;
+            }
         }
-        
-        return frames;
-    }
 
-    function showAccessGranted(name) {
-        return new Promise((resolve) => {
-            const overlay = document.createElement('div');
-            overlay.className = 'loading-overlay';
-            overlay.innerHTML = `
+        function addTerminalMessage(msg) {
+            const terminal = document.getElementById('terminalBox');
+
+            terminal.innerHTML += `> ${msg}<br>`;
+
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        function updateStatus(msg, color) {
+            statusMessage.textContent = msg;
+            statusMessage.style.color = color;
+        }
+
+        function showTemporaryInstruction(message, duration) {
+            const originalMessage = statusMessage.textContent;
+            const originalColor = statusMessage.style.color;
+            updateStatus(message, '#ff00ff');
+            if (instructionTimeout) clearTimeout(instructionTimeout);
+            instructionTimeout = setTimeout(() => {
+                updateStatus(originalMessage, originalColor);
+            }, duration);
+        }
+
+        // Capture multiple frames for liveness detection
+        async function captureMultipleFrames(frameCount = 20, intervalMs = 200) {
+            const frames = [];
+
+            for (let i = 0; i < frameCount; i++) {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                canvas.getContext('2d').drawImage(video, 0, 0);
+                const frameData = canvas.toDataURL('image/jpeg', 0.8);
+                frames.push(frameData);
+
+                let seconds = ((i + 1) * intervalMs / 1000).toFixed(1);
+                updateStatus(`🔍 CAPTURING... ${seconds}s / 4s`, '#ffff00');
+
+                await new Promise(resolve => setTimeout(resolve, intervalMs));
+            }
+
+            return frames;
+        }
+
+        function showAccessGranted(name) {
+            return new Promise((resolve) => {
+                const overlay = document.createElement('div');
+                overlay.className = 'loading-overlay';
+                overlay.innerHTML = `
                 <div style="text-align: center; animation: fadeIn 0.5s;">
                     <h1 style="color: #00ff00; font-size: 2rem;">🔓 ACCESS GRANTED</h1>
                     <div style="color: #00ffff; margin: 1rem;">IDENTITY: ${name.toUpperCase()}</div>
@@ -550,112 +663,120 @@
                     <div style="color: #00ffff; margin-top: 1rem;">REDIRECTING...</div>
                 </div>
             `;
-            document.body.appendChild(overlay);
-            setTimeout(() => {
-                overlay.remove();
-                resolve();
-            }, 2500);
-        });
-    }
-
-    // Main verification function with liveness
-    async function captureAndVerifyWithLiveness() {
-        if (isProcessing) return;
-        isProcessing = true;
-        scanBtn.disabled = true;
-
-        showTemporaryInstruction('👁️ BLINK 2 TIMES NATURALLY (4 seconds)', 4000);
-        
-        startScanSound();
-        updateStatus('🎥 GETTING READY...', '#ffff00');
-        statusLed.style.background = '#ffff00';
-
-        try {
-            // Capture multiple frames for liveness detection
-            const frames = await captureMultipleFrames(20, 200);
-            
-            updateStatus('🔍 ANALYZING BLINKS & FACE...', '#ffff00');
-            
-            // Send frames for liveness + face verification
-            const response = await fetch('/api/face/verify-liveness/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ frames: frames })
-            });
-
-            const result = await response.json();
-
-            if (result.status === 'success') {
-                stopScanSound();
-                playSound('granted');
-                attemptCount = 0;
-
-                updateStatus(`✅ ${result.blink_count} BLINKS - WELCOME ${result.name.toUpperCase()}`, '#00ff00');
-                statusLed.style.background = '#00ff00';
-                localStorage.setItem('cyber_user', result.name);
-
-                await showAccessGranted(result.name);
-                window.location.href = '/dashboard/ai-intro/';
-
-            } else {
-                stopScanSound();
-                playSound('denied');
-                attemptCount++;
-
-                if (result.liveness_failed) {
-                    updateStatus(`❌ FAILED: Only ${result.blink_count} blink(s) detected (Need 2)`, '#ff0000');
-                    setTimeout(() => {
-                        showTemporaryInstruction('👁️ TIP: Blink 2 times naturally in 4 seconds', 3000);
-                    }, 2000);
-                } else {
-                    updateStatus(`❌ ${result.message}`, '#ff0000');
-                }
-                
-                statusLed.style.background = '#ff0000';
-
-                if (attemptCount >= 3) {
-                    playSound('warning');
-                    updateStatus('⚠️ MULTIPLE FAILED ATTEMPTS', '#ff00ff');
-                }
-
+                document.body.appendChild(overlay);
                 setTimeout(() => {
-                    updateStatus('READY FOR SCAN', '#00ffff');
-                    statusLed.style.background = '#00ffff';
+                    overlay.remove();
+                    resolve();
                 }, 2500);
-            }
-
-        } catch (err) {
-            stopScanSound();
-            updateStatus('ERROR: ' + err.message, '#ff0000');
-            console.error(err);
-        } finally {
-            isProcessing = false;
-            scanBtn.disabled = false;
+            });
         }
-    }
 
-    function resetSystem() {
-        attemptCount = 0;
-        stopScanSound();
-        if (instructionTimeout) clearTimeout(instructionTimeout);
-        updateStatus('SYSTEM RESETTING...', '#ffff00');
-        setTimeout(() => updateStatus('READY FOR SCAN', '#00ffff'), 1500);
-    }
+        // Main verification function with liveness
+        async function captureAndVerifyWithLiveness() {
+            if (isProcessing) return;
+            isProcessing = true;
+            scanBtn.disabled = true;
 
-    // Attach event listeners
-    scanBtn.addEventListener('click', () => {
-        captureAndVerifyWithLiveness();
-    });
+            showTemporaryInstruction('👁️ BLINK 2 TIMES NATURALLY (4 seconds)', 4000);
 
-    resetBtn.addEventListener('click', resetSystem);
+            startScanSound();
+            document.querySelector('.face-box').style.borderColor = '#ffff00';
+            updateStatus('🎥 GETTING READY...', '#ffff00');
+            addTerminalMessage('SCANNING FACE...');
+            statusLed.style.background = '#ffff00';
 
-    window.addEventListener('load', initCamera);
+            try {
+                // Capture multiple frames for liveness detection
+                const frames = await captureMultipleFrames(20, 200);
 
-    window.addEventListener('beforeunload', () => {
-        if (stream) stream.getTracks().forEach(t => t.stop());
-        if (instructionTimeout) clearTimeout(instructionTimeout);
-    });
-</script>
+                updateStatus('🔍 ANALYZING BLINKS & FACE...', '#ffff00');
+                addTerminalMessage('ANALYZING FEATURES...');
+
+                // Send frames for liveness + face verification
+                const response = await fetch('/api/face/verify-liveness/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ frames: frames })
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    document.querySelector('.face-box').style.borderColor = '#00ff00';
+                    addTerminalMessage('MATCH FOUND');
+                    addTerminalMessage('AUTHORIZATION SUCCESSFUL');
+                    stopScanSound();
+                    playSound('granted');
+                    attemptCount = 0;
+
+                    updateStatus(`✅ ${result.blink_count} BLINKS - WELCOME ${result.name.toUpperCase()}`, '#00ff00');
+                    statusLed.style.background = '#00ff00';
+                    localStorage.setItem('cyber_user', result.name);
+
+                    await showAccessGranted(result.name);
+                    window.location.href = '/dashboard/ai-intro/';
+
+                } else {
+                    document.querySelector('.face-box').style.borderColor = '#ff0000';
+                    addTerminalMessage('ACCESS DENIED');
+                    stopScanSound();
+                    playSound('denied');
+                    attemptCount++;
+
+                    if (result.liveness_failed) {
+                        updateStatus(`❌ FAILED: Only ${result.blink_count} blink(s) detected (Need 2)`, '#ff0000');
+                        setTimeout(() => {
+                            showTemporaryInstruction('👁️ TIP: Blink 2 times naturally in 4 seconds', 3000);
+                        }, 2000);
+                    } else {
+                        updateStatus(`❌ ${result.message}`, '#ff0000');
+                    }
+
+                    statusLed.style.background = '#ff0000';
+
+                    if (attemptCount >= 3) {
+                        playSound('warning');
+                        updateStatus('⚠️ MULTIPLE FAILED ATTEMPTS', '#ff00ff');
+                    }
+
+                    setTimeout(() => {
+                        updateStatus('READY FOR SCAN', '#00ffff');
+                        statusLed.style.background = '#00ffff';
+                    }, 2500);
+                }
+
+            } catch (err) {
+                stopScanSound();
+                updateStatus('ERROR: ' + err.message, '#ff0000');
+                console.error(err);
+            } finally {
+                isProcessing = false;
+                scanBtn.disabled = false;
+            }
+        }
+
+        function resetSystem() {
+            attemptCount = 0;
+            stopScanSound();
+            if (instructionTimeout) clearTimeout(instructionTimeout);
+            updateStatus('SYSTEM RESETTING...', '#ffff00');
+            setTimeout(() => updateStatus('READY FOR SCAN', '#00ffff'), 1500);
+        }
+
+        // Attach event listeners
+        scanBtn.addEventListener('click', () => {
+            captureAndVerifyWithLiveness();
+        });
+
+        resetBtn.addEventListener('click', resetSystem);
+
+        window.addEventListener('load', initCamera);
+
+        window.addEventListener('beforeunload', () => {
+            if (stream) stream.getTracks().forEach(t => t.stop());
+            if (instructionTimeout) clearTimeout(instructionTimeout);
+        });
+    </script>
 </body>
 
 </html>
