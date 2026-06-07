@@ -17,6 +17,7 @@ from django.conf import settings
 
 from .models import LoginActivity
 from django.core.files.base import ContentFile
+from django.shortcuts import render
 
 
 
@@ -182,12 +183,12 @@ def verify_with_liveness_first(request):
             # Reset failed attempts
             failed_attempts = 0
 
-            LoginActivity.objects.create(
-    user=None,
-    ip_address=get_client_ip(request),
-    device_info=device_info,
-    status='SUCCESS'
-)
+#             LoginActivity.objects.create(
+#     user=None,
+#     ip_address=get_client_ip(request),
+#     device_info=device_info,
+#     status='SUCCESS'
+# )
 
             return JsonResponse({
                 'status': 'success',
@@ -346,3 +347,13 @@ def save_intruder_image(frame, request):
             ContentFile(f.read()),
             save=True
         )
+
+
+def security_monitor(request):
+
+    logs = LoginActivity.objects.all().order_by('-login_time')
+    return render(
+        request,
+        'security_monitor.html',
+        {'logs': logs}
+    )

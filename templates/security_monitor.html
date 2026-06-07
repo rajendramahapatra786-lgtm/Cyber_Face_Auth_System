@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Cyber Security Monitor</title>
+
+    <style>
+        body {
+            background: black;
+            color: #00ffcc;
+            font-family: Consolas;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #00ffcc;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #00ffcc;
+            padding: 12px;
+            text-align: center;
+        }
+
+        th {
+            background: #001a1a;
+        }
+
+        img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        tr:hover {
+            background: #002222;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <h1>⚠ Cyber Security Monitor ⚠</h1>
+
+    <table>
+
+        <tr>
+            <th>Face</th>
+            <th>Status</th>
+            <th>IP Address</th>
+            <th>Device</th>
+            <th>Time</th>
+        </tr>
+
+        {% for log in logs %}
+
+        <tr>
+
+            <td>
+
+                {% if log.face_image %}
+                <img src="{{ log.face_image.url }}">
+                {% else %}
+                No Image
+                {% endif %}
+
+            </td>
+
+            <td>{{ log.status }}</td>
+
+            <td>{{ log.ip_address }}</td>
+
+            <td>{{ log.device_info }}</td>
+
+            <td>{{ log.login_time }}</td>
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+</body>
+
+</html>
