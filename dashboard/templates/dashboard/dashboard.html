@@ -422,13 +422,22 @@
 
         <!-- Action Buttons -->
         <div class="action-buttons">
-            <button class="cyber-btn" id="refreshBtn">⟳ REFRESH DATA</button>
-            <button class="cyber-btn cyber-btn-danger" id="logoutBtn">🚪 EXIT SYSTEM</button>
+            <button class="cyber-btn" id="refreshBtn">
+                ⟳ REFRESH DATA
+            </button>
+
+            <button class="cyber-btn" id="securityMonitorBtn">
+                ⚠ SECURITY MONITOR
+            </button>
+
+            <button class="cyber-btn cyber-btn-danger" id="logoutBtn">
+                🚪 EXIT SYSTEM
+            </button>
         </div>
 
         <!-- Security Notice -->
         <div class="security-notice">
-⚠️ SIMULATION MODE ACTIVE — No real intrusion, tracking, or system compromise is performed.        </div>
+            ⚠️ SIMULATION MODE ACTIVE — No real intrusion, tracking, or system compromise is performed. </div>
     </div>
 
     <script src="{% static 'js/cyber-sound.js' %}"></script>
@@ -667,26 +676,38 @@
             });
         }
 
+        document.getElementById('securityMonitorBtn').addEventListener('click', function () {
 
-    function speak(text) {
-    window.speechSynthesis.cancel();
+            cyberAction({
+                sound: "scan_2.mp3",
+                text: "Opening security monitor"
+            });
 
-    const speech = new SpeechSynthesisUtterance(text);
+            setTimeout(() => {
+                window.location.href = "/api/face/security-monitor/";
+            }, 800);
+        });
 
-    speech.pitch = 0.5;
-    speech.rate = 0.78;
-    speech.volume = 1;
 
-    const voices = window.speechSynthesis.getVoices();
-    speech.voice =
-        voices.find(v => v.name.includes("Google UK English Male")) ||
-        voices[0];
+        function speak(text) {
+            window.speechSynthesis.cancel();
 
-    // 🎧 slight delay for cinematic feel
-    setTimeout(() => {
-        window.speechSynthesis.speak(speech);
-    }, 100);
-}
+            const speech = new SpeechSynthesisUtterance(text);
+
+            speech.pitch = 0.5;
+            speech.rate = 0.78;
+            speech.volume = 1;
+
+            const voices = window.speechSynthesis.getVoices();
+            speech.voice =
+                voices.find(v => v.name.includes("Google UK English Male")) ||
+                voices[0];
+
+            // 🎧 slight delay for cinematic feel
+            setTimeout(() => {
+                window.speechSynthesis.speak(speech);
+            }, 100);
+        }
         function cyberAction({ sound = null, text = "", delay = 300 }) {
             // 🔊 Play sound (if exists)
             if (sound) {

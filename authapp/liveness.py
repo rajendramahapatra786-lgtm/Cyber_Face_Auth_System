@@ -35,7 +35,11 @@ class LivenessDetector:
         # If eyes are closed (0 eyes detected) - counts as blink frame
         is_blinking = eyes_detected < 2
         
+        print(f"Faces detected: {len(faces)}")
+        print(f"Eyes detected: {eyes_detected}")
         return is_blinking, eyes_detected
+    
+
     
     def check_liveness_and_count_blinks(self, frames_data):
         """Check multiple frames for blink pattern"""
@@ -72,8 +76,15 @@ class LivenessDetector:
                 continue
         
         print(f"Total blinks detected: {blink_count}")
+
+        print(
+            f"Blinking={is_blinking}, "
+            f"Eyes={eyes_count}, "
+            f"BlinkCount={blink_count}" )
         
         if blink_count >= 2:
             return blink_count, True
         else:
             return blink_count, False
+        
+      
