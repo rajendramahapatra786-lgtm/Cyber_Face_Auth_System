@@ -26,10 +26,8 @@ liveness_detector = LivenessDetector()
 face_validator = FaceValidator()
 
 
-
-
 # Failed login counter
-failed_attempts = 0
+# failed_attempts = 0
 
 
 def get_client_ip(request):
@@ -92,9 +90,10 @@ def verify_with_liveness_first(request):
     Step 3 → Face recognition
     """
 
-    global failed_attempts
+    # global failed_attempts
 
     device_info = request.META.get('HTTP_USER_AGENT')
+    failed_attempts = request.session.get('failed_attempts', 0)
 
     try:
         print("=" * 50)
@@ -126,11 +125,7 @@ def verify_with_liveness_first(request):
 
         if not is_live:
 
-            LoginActivity.objects.create(
-                ip_address=get_client_ip(request),
-                device_info=device_info,
-                status='LIVENESS_FAILED'
-            )
+            
 
             return JsonResponse({
                 'status': 'fail',
@@ -179,16 +174,8 @@ def verify_with_liveness_first(request):
         # =========================
 
         if name:
+            request.session['failed_attempts'] = 0
 
-            # Reset failed attempts
-            failed_attempts = 0
-
-#             LoginActivity.objects.create(
-#     user=None,
-#     ip_address=get_client_ip(request),
-#     device_info=device_info,
-#     status='SUCCESS'
-# )
 
             return JsonResponse({
                 'status': 'success',
@@ -205,12 +192,7 @@ def verify_with_liveness_first(request):
         else:
 
             failed_attempts += 1
-
-            LoginActivity.objects.create(
-    ip_address=get_client_ip(request),
-    device_info=device_info,
-    status='FAILED'
-)
+            request.session['failed_attempts'] = failed_attempts
 
             print(f"Failed Attempts: {failed_attempts}")
 
