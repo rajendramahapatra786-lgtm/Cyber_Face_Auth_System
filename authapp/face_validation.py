@@ -68,7 +68,7 @@ class FaceValidator:
 
             # If lower face too dark
             # likely covered by hand/object
-            if brightness < 55:
+            if brightness < 70:
                 return False, "❌ Lower face covered"
 
             # -----------------------------------

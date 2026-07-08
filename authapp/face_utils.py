@@ -1,86 +1,145 @@
-from deepface import DeepFace
-from pathlib import Path
-import numpy as np
 import cv2
+import numpy as np
+from pathlib import Path
 
 
 class CyberFaceRecognizer:
+
     def __init__(self):
-        self.known_faces_dir = Path(__file__).parent / 'known_faces'
+
+        self.known_faces_dir = Path(__file__).parent / "known_faces"
         self.known_faces_dir.mkdir(exist_ok=True)
 
-        self.known_embeddings = []
-        self.known_names = []
+        # LBPH recognizer
+        self.recognizer = cv2.face.LBPHFaceRecognizer_create()
 
-        print("Loading embeddings...")
-        self.load_known_faces()
+        # Haarcascade face detector
+        self.face_cascade = cv2.CascadeClassifier(
+            cv2.data.haarcascades +
+            "haarcascade_frontalface_default.xml"
+        )
 
-    # 🔥 STEP 1: Load all embeddings ONCE
-    def load_known_faces(self):
-        self.known_embeddings = []
-        self.known_names = []
+        self.label_map = {}
 
-        for img_path in self.known_faces_dir.glob('*.*'):
-            if img_path.suffix.lower() not in ['.jpg', '.jpeg', '.png']:
+        print("Training face recognizer...")
+        self.train_model()
+
+    # ---------------------------------
+    # Train all known faces
+    # ---------------------------------
+    def train_model(self):
+
+        faces = []
+        labels = []
+
+        current_label = 0
+
+        for img_path in self.known_faces_dir.glob("*.*"):
+
+            if img_path.suffix.lower() not in [
+                ".jpg", ".jpeg", ".png"
+            ]:
                 continue
 
-            name = img_path.stem.split('_')[0]
+            name = img_path.stem.split("_")[0]
 
-            try:
-                embedding = DeepFace.represent(
-                    img_path=str(img_path),
-                    model_name="Facenet",
-                    enforce_detection=False
-                )[0]["embedding"]
+            img = cv2.imread(str(img_path))
+            gray = cv2.cvtColor(
+                img,
+                cv2.COLOR_BGR2GRAY
+            )
 
-                self.known_embeddings.append(np.array(embedding))
-                self.known_names.append(name)
+            detected = self.face_cascade.detectMultiScale(
+                gray,
+                1.3,
+                5
+            )
 
-                print(f"Loaded: {img_path.name}")
+            if len(detected) == 0:
+                continue
 
-            except Exception as e:
-                print(f"Error loading {img_path.name}: {e}")
+            x, y, w, h = detected[0]
 
-        print("Total embeddings:", len(self.known_embeddings))
+            face_roi = gray[y:y+h, x:x+w]
 
-    # 🔥 STEP 2: Fast recognition
-    def detect_and_recognize(self, image_bytes):
+            faces.append(face_roi)
+            labels.append(current_label)
+
+            self.label_map[current_label] = name
+
+            print("Loaded:", name)
+
+            current_label += 1
+
+        if len(faces) > 0:
+
+            self.recognizer.train(
+                faces,
+                np.array(labels)
+            )
+
+            print("Training complete")
+
+        else:
+            print("No known faces found")
+
+    # ---------------------------------
+    # Recognize current face
+    # ---------------------------------
+    def detect_and_recognize(
+        self,
+        image_bytes
+    ):
+
         try:
-            nparr = np.frombuffer(image_bytes, np.uint8)
-            img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-            if img is None:
+            nparr = np.frombuffer(
+                image_bytes,
+                np.uint8
+            )
+
+            img = cv2.imdecode(
+                nparr,
+                cv2.IMREAD_COLOR
+            )
+
+            gray = cv2.cvtColor(
+                img,
+                cv2.COLOR_BGR2GRAY
+            )
+
+            faces = self.face_cascade.detectMultiScale(
+                gray,
+                1.3,
+                5
+            )
+
+            if len(faces) == 0:
                 return None, None
 
-            # Get embedding for current frame
-            embedding = DeepFace.represent(
-                img_path=img,
-                model_name="Facenet",
-                enforce_detection=False
-            )[0]["embedding"]
+            x, y, w, h = faces[0]
 
-            embedding = np.array(embedding)
+            face_roi = gray[y:y+h, x:x+w]
 
-            best_match = None
-            best_distance = float("inf")
+            label, confidence = self.recognizer.predict(
+                face_roi
+            )
 
-            # Compare with stored embeddings (FAST)
-            for i, known_embedding in enumerate(self.known_embeddings):
-                distance = np.linalg.norm(known_embedding - embedding)
+            print("Confidence:", confidence)
 
-                print("Distance:", distance)
+            # Lower confidence = better
+            if confidence < 80:
 
-                if distance < best_distance:
-                    best_distance = distance
-                    best_match = self.known_names[i]
+                name = self.label_map[label]
 
-            # Threshold (important)
-            if best_distance < 10:   # tune this later
-                confidence = 1 / (1 + best_distance)
-                return best_match, confidence
+                score = 1 - (confidence / 100)
+
+                return name, score
 
             return None, None
 
         except Exception as e:
-            print("Error:", e)
+
+            print("Recognition Error:", e)
+
             return None, None
