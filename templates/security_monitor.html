@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Cyber Security Monitor</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <style>
         body {
@@ -45,6 +46,19 @@
         tr:hover {
             background: #002222;
         }
+
+        .delete-icon {
+            color: #00ffcc;
+            font-size: 22px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .delete-icon:hover {
+            color: #ff0000;
+            transform: scale(1.2);
+            text-shadow: 0 0 10px red;
+        }
     </style>
 
 </head>
@@ -61,6 +75,7 @@
             <th>IP Address</th>
             <th>Device</th>
             <th>Time</th>
+            <th>Action</th>
         </tr>
 
         {% for log in logs %}
@@ -84,6 +99,14 @@
             <td>{{ log.device_info }}</td>
 
             <td>{{ log.login_time }}</td>
+
+            <td>
+                <a href="{% url 'delete_log' log.id %}"
+                    onclick="return confirm('Are you sure you want to delete this log?')">
+                    <i class="bi bi-trash3-fill delete-icon"></i>
+                </a>
+            </td>
+
         </tr>
 
         {% endfor %}

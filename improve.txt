@@ -1,3 +1,19 @@
+I have a few ideas to make it even more professional:
+1. Use a POST request instead of GET (recommended)
+
+Right now, clicking the link sends a GET request to delete the log. A better practice is to use a POST request, because deleting data should not happen through a GET request. This also adds protection against accidental deletions.
+
+2. Success message
+
+After deleting, show a message like:
+
+✅ Security log deleted successfully.
+
+using Django's messages framework.
+
+
+
+
 
 5.1 Add:
 - User management

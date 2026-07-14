@@ -19,6 +19,8 @@ from .models import LoginActivity
 from django.core.files.base import ContentFile
 from django.shortcuts import render
 
+from django.shortcuts import get_object_or_404, redirect
+
 
 
 face_recognizer = CyberFaceRecognizer()
@@ -339,3 +341,16 @@ def security_monitor(request):
         'security_monitor.html',
         {'logs': logs}
     )
+
+def delete_log(request, log_id):
+
+    log = get_object_or_404(LoginActivity, id=log_id)
+
+    # Delete image from media folder (if it exists)
+    if log.face_image:
+        log.face_image.delete(save=False)
+
+    # Delete database record
+    log.delete()
+
+    return redirect('security_monitor')
