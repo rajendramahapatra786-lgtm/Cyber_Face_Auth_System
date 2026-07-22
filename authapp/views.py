@@ -11,9 +11,7 @@ from .face_utils import CyberFaceRecognizer
 from .liveness import LivenessDetector
 from .face_validation import FaceValidator
 
-import os
-from django.conf import settings
-
+import uuid
 
 from .models import LoginActivity
 from django.core.files.base import ContentFile
@@ -287,52 +285,44 @@ def register_face(request):
             'message': str(e)
         })
 
-
 # ===================================================
 # SAVE INTRUDER IMAGE
 # ===================================================
 
 def save_intruder_image(frame, request):
 
-    intruder_folder = os.path.join(
-        settings.MEDIA_ROOT,
-        'intruders'
-    )
+    # Convert OpenCV image to JPG
+    success, buffer = cv2.imencode(".jpg", frame)
 
-    os.makedirs(intruder_folder, exist_ok=True)
+    if not success:
+        print("❌ Failed to encode intruder image.")
+        return
 
-    image_count = len(os.listdir(intruder_folder)) + 1
+    filename = f"intruder_{uuid.uuid4().hex}.jpg"
 
-    filename = f"intruder_{image_count}.jpg"
-
-    image_path = os.path.join(
-        intruder_folder,
-        filename
-    )
-
-    cv2.imwrite(image_path, frame)
-
-    print(f"Intruder image saved: {image_path}")
-
-    # =========================
-    # SAVE TO LOGIN ACTIVITY
-    # =========================
-
-    activity = LoginActivity.objects.create(
+    # Create activity (don't save yet)
+    activity = LoginActivity(
         ip_address=get_client_ip(request),
-        device_info=request.META.get('HTTP_USER_AGENT'),
-        status='UNKNOWN_FACE'
+        device_info=request.META.get("HTTP_USER_AGENT"),
+        status="UNKNOWN_FACE"
     )
 
-    with open(image_path, 'rb') as f:
-
+    try:
+        # Save image directly to login_faces/
         activity.face_image.save(
             filename,
-            ContentFile(f.read()),
-            save=True
+            ContentFile(buffer.tobytes()),
+            save=False
         )
 
+        # Save database record
+        activity.save()
 
+        print(f"✅ Intruder image saved successfully: {filename}")
+
+    except Exception as e:
+        print(f"❌ Failed to save intruder image: {e}")
+ 
 def security_monitor(request):
 
     logs = LoginActivity.objects.all().order_by('-login_time')

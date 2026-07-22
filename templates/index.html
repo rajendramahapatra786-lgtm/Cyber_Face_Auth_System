@@ -341,12 +341,6 @@
             white-space: nowrap;
         }
 
-        .notice-content {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            color: #ff00ff;
-        }
 
         @media (max-width: 768px) {
             .camera-container {
@@ -364,11 +358,6 @@
                 padding: 0 1rem;
             }
 
-            .security-notice {
-                white-space: normal;
-                text-align: center;
-                font-size: 0.6rem;
-            }
         }
 
         @keyframes fadeOut {
@@ -533,15 +522,8 @@
                 ⟳ RESET
             </button>
         </div>
-
-        <div class="security-notice">
-            <div class="notice-content">
-                <span>⚠️</span>
-                <span>EDUCATIONAL SIMULATION - No real data stored</span>
-                <span>⚠️</span>
-            </div>
-        </div>
     </div>
+
     <script src="{% static 'js/cyber-sound.js' %}"></script>
     <script>
         // Camera and Face Recognition
@@ -777,6 +759,6 @@
             if (instructionTimeout) clearTimeout(instructionTimeout);
         });
     </script>
-</body>
 
+</body>
 </html>
