@@ -12,9 +12,6 @@ After deleting, show a message like:
 using Django's messages framework.
 
 
-
-
-
 5.1 Add:
 - User management
 - Login analytics
