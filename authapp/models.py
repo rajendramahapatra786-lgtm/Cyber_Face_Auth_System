@@ -53,3 +53,14 @@ class LoginActivity(models.Model):
 
     def __str__(self):
         return f"{self.user} - {self.status}"
+
+
+class RegisteredUser(models.Model):
+    username = models.CharField(max_length=100, unique=True)
+
+    password = models.CharField(max_length=255)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.username    

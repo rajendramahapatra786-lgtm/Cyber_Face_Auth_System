@@ -514,18 +514,27 @@
         </div>
 
         <div class="button-group">
+
             <button id="scanBtn" class="cyber-btn cyber-btn-primary">
                 🔓 INITIATE SCAN
+            </button>
+
+            <button id="registerBtn" class="cyber-btn cyber-btn-secondary">
+                👤 REGISTER FACE
             </button>
 
             <button id="resetBtn" class="cyber-btn cyber-btn-secondary">
                 ⟳ RESET
             </button>
+
         </div>
     </div>
 
     <script src="{% static 'js/cyber-sound.js' %}"></script>
     <script>
+
+        console.log("SCRIPT LOADED");
+
         // Camera and Face Recognition
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
@@ -533,6 +542,10 @@
         const resetBtn = document.getElementById('resetBtn');
         const statusMessage = document.getElementById('statusMessage');
         const statusLed = document.getElementById('statusLed');
+        const registerBtn = document.getElementById('registerBtn');
+
+
+
 
         let stream = null;
         let isProcessing = false;
@@ -577,18 +590,47 @@
         }, { once: true });
 
         async function initCamera() {
+
             try {
+
                 updateStatus('INITIALIZING CAMERA...', '#ffff00');
-                stream = await navigator.mediaDevices.getUserMedia({ video: true });
+
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: true
+                });
+
                 video.srcObject = stream;
-                updateStatus('CAMERA READY. POSITION YOUR FACE', '#00ff00');
+
+                updateStatus('CAMERA READY', '#00ff00');
                 statusLed.style.background = '#00ff00';
-            } catch (err) {
-                updateStatus('ERROR: CAMERA ACCESS DENIED', '#ff0000');
-                statusLed.style.background = '#ff0000';
-                scanBtn.disabled = true;
+
+                // Check registered user
+                const response = await fetch('/api/face/check-user/');
+                const data = await response.json();
+
+                console.log(data);
+
+                if (data.registered) {
+
+                    registerBtn.innerHTML = "🗑 REMOVE USER";
+
+                } else {
+
+                    registerBtn.innerHTML = "👤 REGISTER FACE";
+
+                }
+
             }
+            catch (err) {
+
+                console.log(err);
+
+                updateStatus('CAMERA ERROR', '#ff0000');
+
+            }
+
         }
+
 
         function addTerminalMessage(msg) {
             const terminal = document.getElementById('terminalBox');
@@ -752,13 +794,22 @@
 
         resetBtn.addEventListener('click', resetSystem);
 
-        window.addEventListener('load', initCamera);
+        console.log("Calling initCamera...");
+        initCamera();
 
         window.addEventListener('beforeunload', () => {
             if (stream) stream.getTracks().forEach(t => t.stop());
             if (instructionTimeout) clearTimeout(instructionTimeout);
         });
+
+        registerBtn.addEventListener("click", function () {
+
+            window.location.href = "/api/face/register-face/";
+
+        });
+
     </script>
 
 </body>
+
 </html>

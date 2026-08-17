@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Face Registration</title>
+</head>
+
+<body>
+
+    <h2 id="welcomeUser"></h2>
+
+    <video id="video" width="500" autoplay playsinline></video>
+
+    <br><br>
+
+    <button id="captureBtn">
+        Start Face Registration
+    </button>
+
+    <hr>
+
+    <h3>OR</h3>
+
+    <input type="file" id="imageUpload" multiple accept="image/*">
+
+    <br><br>
+
+    <button id="uploadBtn">
+        Upload to System
+    </button>
+
+    <canvas id="canvas" style="display:none;"></canvas>
+
+    <script>
+
+        const username = sessionStorage.getItem("username");
+        const password = sessionStorage.getItem("password");
+
+        document.getElementById("welcomeUser").innerHTML =
+            "Registering Face for : <b>" + username + "</b>";
+
+        const video = document.getElementById("video");
+
+        async function startCamera() {
+
+            try {
+
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: true
+                });
+
+                video.srcObject = stream;
+
+            } catch (err) {
+
+                alert("Camera access denied.");
+
+            }
+
+        }
+
+        const captureBtn = document.getElementById("captureBtn");
+        const canvas = document.getElementById("canvas");
+
+        captureBtn.addEventListener("click", captureFaces);
+
+        async function captureFaces() {
+
+            const images = [];
+
+            for (let i = 0; i < 20; i++) {
+
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+
+                canvas.getContext("2d").drawImage(
+                    video,
+                    0,
+                    0,
+                    canvas.width,
+                    canvas.height
+                );
+
+                images.push(canvas.toDataURL("image/jpeg"));
+
+                console.log("Captured Image:", i + 1);
+
+                await new Promise(resolve => setTimeout(resolve, 300));
+            }
+
+            console.log(images);
+
+            const response = await fetch("/api/face/register/", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+
+                    username: username,
+
+                    images: images
+
+                })
+
+            });
+
+            const data = await response.json();
+
+            console.log("Server Response:", data);
+            alert(JSON.stringify(data));
+
+            if (data.status === "success") {
+
+                alert("Face Registered Successfully!");
+
+            } else {
+
+                alert(data.message);
+
+            }
+
+        }
+
+
+        const uploadBtn = document.getElementById("uploadBtn");
+
+        uploadBtn.addEventListener("click", uploadImages);
+
+
+        async function uploadImages() {
+
+            const files = document.getElementById("imageUpload").files;
+
+            if (files.length === 0) {
+
+                alert("Please choose images.");
+
+                return;
+
+            }
+
+            if (files.length < 10) {
+
+                alert("Please upload at least 10 images.");
+
+                return;
+
+            }
+
+            const images = [];
+
+            for (const file of files) {
+
+                const base64 = await fileToBase64(file);
+
+                images.push(base64);
+
+            }
+
+            const response = await fetch("/api/face/register/", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+
+                    username: username,
+
+                    images: images
+
+                })
+
+            });
+
+            const data = await response.json();
+
+            alert(data.message);
+
+        }
+
+        function fileToBase64(file) {
+
+            return new Promise((resolve) => {
+
+                const reader = new FileReader();
+
+                reader.onload = () => resolve(reader.result);
+
+                reader.readAsDataURL(file);
+
+            });
+
+        }
+
+        startCamera();
+
+    </script>
+
+</body>
+
+</html>

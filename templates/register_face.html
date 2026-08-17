@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Face</title>
+</head>
+
+<body>
+
+    <h1>CYBER FACE REGISTRATION</h1>
+
+    <form>
+
+        <label>Username</label><br>
+        <input type="text" id="username" placeholder="Enter Username">
+
+        <br><br>
+
+        <label>Password</label><br>
+        <input type="password" id="password" placeholder="Enter Password">
+
+        <br><br>
+
+        <label>Confirm Password</label><br>
+        <input type="password" id="confirmPassword" placeholder="Confirm Password">
+
+        <br><br>
+
+        <button type="button" id="nextBtn">
+            NEXT →
+        </button>
+
+    </form>
+
+    <script>
+
+        const nextBtn = document.getElementById("nextBtn");
+
+        nextBtn.addEventListener("click", async function () {
+
+            const username = document.getElementById("username").value.trim();
+            const password = document.getElementById("password").value;
+            const confirmPassword = document.getElementById("confirmPassword").value;
+
+            // Check empty fields
+            if (username === "" || password === "" || confirmPassword === "") {
+                alert("Please fill all fields.");
+                return;
+            }
+
+            // Check password match
+            if (password !== confirmPassword) {
+                alert("Passwords do not match.");
+                return;
+            }
+
+            try {
+
+                const response = await fetch("/api/face/register-user/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.status === "success") {
+
+                    // Save temporarily for camera page
+                    sessionStorage.setItem("username", username);
+                    sessionStorage.setItem("password", password);
+
+                    // Go to camera registration
+                    window.location.href = "/api/face/register-scan/";
+
+                } else {
+
+                    alert(data.message);
+
+                }
+
+            } catch (error) {
+
+                alert("Server error.");
+
+            }
+
+        });
+
+    </script>
+
+</body>
+
+</html>

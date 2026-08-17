@@ -7,14 +7,18 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
+from django.contrib.auth.hashers import make_password
+
 from .face_utils import CyberFaceRecognizer
+
 from .liveness import LivenessDetector
 from .face_validation import FaceValidator
 
 import uuid
 
-from .models import LoginActivity
+from .models import LoginActivity, RegisteredUser
 from django.core.files.base import ContentFile
+
 from django.shortcuts import render
 
 from django.shortcuts import get_object_or_404, redirect
@@ -24,10 +28,6 @@ from django.shortcuts import get_object_or_404, redirect
 face_recognizer = CyberFaceRecognizer()
 liveness_detector = LivenessDetector()
 face_validator = FaceValidator()
-
-
-# Failed login counter
-# failed_attempts = 0
 
 
 def get_client_ip(request):
@@ -252,6 +252,8 @@ def verify_with_liveness_first(request):
 @require_http_methods(["POST"])
 def register_face(request):
 
+    global face_recognizer
+
     try:
         data = json.loads(request.body)
 
@@ -271,7 +273,7 @@ def register_face(request):
                 f.write(image_bytes)
 
         # Reload embeddings
-        face_recognizer.load_known_faces()
+        face_recognizer = CyberFaceRecognizer()
 
         return JsonResponse({
             'status': 'success',
@@ -344,3 +346,62 @@ def delete_log(request, log_id):
     log.delete()
 
     return redirect('security_monitor')
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def register_user(request):
+
+    try:
+
+        data = json.loads(request.body)
+
+        username = data.get("username")
+        password = data.get("password")
+
+        if RegisteredUser.objects.filter(username=username).exists():
+
+            return JsonResponse({
+                "status": "error",
+                "message": "Username already exists"
+            })
+
+        RegisteredUser.objects.create(
+            username=username,
+            password=make_password(password)
+        )
+
+        return JsonResponse({
+            "status": "success"
+        })
+
+    except Exception as e:
+
+        return JsonResponse({
+            "status": "error",
+            "message": str(e)
+        })
+
+from django.http import JsonResponse
+
+def registration_status(request):
+
+    registered = RegisteredUser.objects.exists()
+
+    return JsonResponse({
+        "registered": registered
+    })
+
+def register_face_page(request):
+    return render(request, "register_face.html")
+
+def register_scan_page(request):
+    return render(request, "register_scan.html")
+
+
+def check_registered_user(request):
+
+    user_exists = RegisteredUser.objects.exists()
+
+    return JsonResponse({
+        "registered": user_exists
+    })
