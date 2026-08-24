@@ -28,6 +28,24 @@ The project combines Artificial Intelligence, Computer Vision, and Web Technolog
 
 ---
 
+# 📸 Project Screenshots
+
+## 🏠 Home Page
+
+![Home Page](screenshots/home.png)
+
+---
+
+## 📊 User Dashboard
+
+![Dashboard](screenshots/dashboard.png)
+
+---
+
+## 🚨 Security Monitor
+
+![Security Monitor](screenshots/security-monitor.png)
+
 # 🎯 Project Objectives
 
 The primary objectives of this project are:
@@ -49,13 +67,27 @@ Open the project in **VS Code**, then open the terminal and run the following co
 
 ### 1️⃣ Create a Virtual Environment
 
+> ⚠️ This project is recommended to run with **Python 3.10** for compatibility with the project dependencies.
+
 ```bash
-python -m venv venv
+py -3.10 -m venv venv
 ```
 
 ### 2️⃣ Activate the Virtual Environment
 
 **Windows (PowerShell)**
+
+```powershell
+.\venv\Scripts\Activate.ps1
+```
+
+If PowerShell blocks the activation script, run:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned
+```
+
+Then activate the environment again:
 
 ```powershell
 .\venv\Scripts\Activate.ps1
@@ -67,13 +99,43 @@ python -m venv venv
 venv\Scripts\activate
 ```
 
-### 3️⃣ Install Project Dependencies
+### 3️⃣ Verify Python Version
+
+Make sure the virtual environment is using **Python 3.10**:
+
+```bash
+python --version
+```
+
+You should see something similar to:
+
+```text
+Python 3.10.x
+```
+
+### 4️⃣ Install Project Dependencies
+
+First, upgrade the required installation tools:
+
+```bash
+python -m pip install --upgrade pip setuptools wheel
+```
+
+Then install all project dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4️⃣ Run the Project
+### 5️⃣ Run the Project
+
+Run the database migrations:
+
+```bash
+python manage.py migrate
+```
+
+Then start the Django development server:
 
 ```bash
 python manage.py runserver
@@ -85,7 +147,7 @@ The application will be available at:
 http://127.0.0.1:8000/
 ```
 
-----
+🎉 **Your Cyber Face Authentication System is now ready to use!**
 
 # ✨ Key Features
 
