@@ -4,35 +4,195 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register Face</title>
+
+    <title>Register Face | Cyber Auth</title>
+
+    <style>
+        /* ===== GLOBAL ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(0, 255, 200, 0.12), transparent 30%),
+                radial-gradient(circle at 80% 80%, rgba(0, 140, 255, 0.12), transparent 30%),
+                #07111f;
+            color: white;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            overflow: hidden;
+        }
+
+        /* ===== BACKGROUND GRID ===== */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+
+            background-image:
+                linear-gradient(rgba(0, 255, 200, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 200, 0.05) 1px, transparent 1px);
+
+            background-size: 40px 40px;
+            pointer-events: none;
+        }
+
+        /* ===== REGISTRATION CARD ===== */
+        .register-container {
+            width: min(90%, 450px);
+            padding: 40px;
+
+            background: rgba(10, 25, 45, 0.88);
+            border: 1px solid rgba(0, 255, 200, 0.35);
+            border-radius: 18px;
+
+            box-shadow:
+                0 0 20px rgba(0, 255, 200, 0.12),
+                0 0 60px rgba(0, 100, 255, 0.08);
+
+            backdrop-filter: blur(12px);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== TITLE ===== */
+        .register-container h1 {
+            text-align: center;
+            font-size: 24px;
+            letter-spacing: 2px;
+            color: #00ffd5;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #8fa6c0;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        /* ===== FORM ===== */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #b8c7d9;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 15px;
+
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+
+            color: white;
+            font-size: 15px;
+            outline: none;
+
+            transition: 0.3s;
+        }
+
+        input::placeholder {
+            color: #66788f;
+        }
+
+        input:focus {
+            border-color: #00ffd5;
+            box-shadow: 0 0 12px rgba(0, 255, 213, 0.2);
+        }
+
+        /* ===== BUTTON ===== */
+        #nextBtn {
+            width: 100%;
+            padding: 14px;
+
+            border: none;
+            border-radius: 8px;
+
+            background: linear-gradient(135deg, #00c6a7, #008cff);
+            color: white;
+
+            font-size: 15px;
+            font-weight: bold;
+            letter-spacing: 1px;
+
+            cursor: pointer;
+            transition: 0.3s;
+
+            margin-top: 5px;
+        }
+
+        #nextBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 200, 200, 0.3);
+        }
+
+        #nextBtn:active {
+            transform: translateY(0);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 480px) {
+            .register-container {
+                padding: 30px 22px;
+            }
+
+            .register-container h1 {
+                font-size: 20px;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-    <h1>CYBER FACE REGISTRATION</h1>
+    <div class="register-container">
 
-    <form>
+        <h1>CYBER FACE REGISTRATION</h1>
 
-        <label>Username</label><br>
-        <input type="text" id="username" placeholder="Enter Username">
+        <p class="subtitle">
+            Create your secure account before face registration
+        </p>
 
-        <br><br>
+        <form>
 
-        <label>Password</label><br>
-        <input type="password" id="password" placeholder="Enter Password">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="username" placeholder="Enter Username">
+            </div>
 
-        <br><br>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="password" placeholder="Enter Password">
+            </div>
 
-        <label>Confirm Password</label><br>
-        <input type="password" id="confirmPassword" placeholder="Confirm Password">
+            <div class="form-group">
+                <label>Confirm Password</label>
+                <input type="password" id="confirmPassword"
+                    placeholder="Confirm Password">
+            </div>
 
-        <br><br>
+            <button type="button" id="nextBtn">
+                NEXT →
+            </button>
 
-        <button type="button" id="nextBtn">
-            NEXT →
-        </button>
+        </form>
 
-    </form>
+    </div>
 
     <script>
 
@@ -97,5 +257,4 @@
     </script>
 
 </body>
-
 </html>
