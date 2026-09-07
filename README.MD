@@ -81,18 +81,6 @@ py -3.10 -m venv venv
 .\venv\Scripts\Activate.ps1
 ```
 
-If PowerShell blocks the activation script, run:
-
-```powershell
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned
-```
-
-Then activate the environment again:
-
-```powershell
-.\venv\Scripts\Activate.ps1
-```
-
 **Windows (Command Prompt)**
 
 ```cmd
