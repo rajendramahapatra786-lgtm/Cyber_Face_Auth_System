@@ -1147,3 +1147,9 @@ Advantages
 - Easier Debugging
 - Reusable Components
 - Secure Authentication Pipeline
+
+---
+
+# ⭐ Support
+
+**If you like this project, consider giving the repository a ⭐ on GitHub!**
